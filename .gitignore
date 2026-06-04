@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.mypy_cache/
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/settings.json
+
+# Проект
+corpus/malware/
+output/
+*.yar
+
+# OS
+.DS_Store
+Thumbs.db
