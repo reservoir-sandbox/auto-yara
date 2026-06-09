@@ -300,31 +300,3 @@ def parse_imports(elf_path: str) -> list[str]:
 
     return imports
 
-
-parsed_header = parse_header(
-    "C:/Users/golor/OneDrive/Desktop/MrPink(Auto-YARA)" "/corpus/clean/bat"
-)
-
-print(parsed_header)
-
-parsed_sections = parse_sections(
-    "C:/Users/golor/OneDrive/Desktop/MrPink(Auto-YARA)" "/corpus/clean/bat"
-)
-
-print(parsed_sections)
-
-parsed_segments = parse_segments(
-    "C:/Users/golor/OneDrive/Desktop/MrPink(Auto-YARA)" "/corpus/clean/bat"
-)
-
-print(parsed_segments)
-
-parsed_dynamic = parse_dynamic(
-    "C:/Users/golor/OneDrive/Desktop/MrPink(Auto-YARA)" "/corpus/clean/bat"
-)
-print(parsed_dynamic)
-
-parsed_imports = parse_imports(
-    "C:/Users/golor/OneDrive/Desktop/MrPink(Auto-YARA)" "/corpus/clean/bat",
-)
-print(parsed_imports)
