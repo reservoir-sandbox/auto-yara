@@ -13,8 +13,8 @@ env/
 # IDE
 .vscode/settings.json
 
-# Проект
-corpus/malware/
+# Project
+corpus/
 output/
 *.yar
 
