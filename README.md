@@ -11,20 +11,20 @@ Automatic YARA rule generator for ELF malware binaries.
 Extracts strings, imports, and metadata from an ELF binary and saves to JSON.
 
 **Usage:**
-\```bash
+```bash
 python feature_extractor.py --input <path_to_elf> --output <path_to_json>
-\```
+```
 
 **Example:**
-\```bash
+```bash
 python feature_extractor.py --input corpus/clean/bat --output output/results.json
-\```
+```
 
 **Output format:**
-\```json
+```json
 {
     "strings": [...],
     "imports": {...},
     "metadata": {...}
 }
-\```
+```
