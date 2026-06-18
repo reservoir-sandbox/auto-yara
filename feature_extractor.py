@@ -61,16 +61,20 @@ def extract_strings(elf_path: str, min_length: int = 8) -> list[dict[str, Any]]:
             if sec is None:
                 continue
             data = sec.data()
+            chunks = data.split(b"\x00")
+            pos = 0
             base_offset = sec["sh_offset"]
             pattern = re.compile(rb"[ -~]{" + str(min_length).encode() + rb",}")
-            for match in pattern.finditer(data):
-                strings.append(
-                    {
-                        "value": match.group().decode("ascii"),
-                        "section": name,
-                        "offset": hex(base_offset + match.start()),
-                    }
-                )
+            for chunk in chunks:
+                for match in pattern.finditer(chunk):
+                    strings.append(
+                        {
+                            "value": match.group().decode("ascii"),
+                            "section": name,
+                            "offset": hex(base_offset + pos + match.start()),
+                        }
+                    )
+                pos += len(chunk) + 1
 
     return strings
 
