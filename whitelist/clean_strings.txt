@@ -1,0 +1,52 @@
+%s (%s) %s
+%s, %s, %s, %s,
+%s, %s, %s, and %s.
+%s, %s, and %s.
+%s, %s, and others.
+%s, and %s.
+* at start of expression
+*iter->cur.ptr == '\0'
++ at start of expression
+/dev/null
+/dev/stderr
+/dev/stdout
+/usr/share/locale
+? at start of expression
+A NULL argv[0] was passed through an exec system call.
+Copyright %s %d Free Software Foundation, Inc.
+Examples:
+License GPLv3+: GNU GPL version 3 or later <%s>.
+POSIXLY_CORRECT
+There is NO WARRANTY, to the extent permitted by law.
+This is free software: you are free to change and redistribute it.
+Try '%s --help' for more information.
+Valid arguments are:
+Written by %s and %s.
+Written by %s, %s, %s,
+Written by %s, %s, and %s.
+Written by %s.
+^[:space:]]
+^_[:alnum:]]
+ambiguous argument %s for %s
+character class syntax is [[:space:]], not [:space:]
+https://gnu.org/licenses/gpl.html
+invalid argument %s for %s
+invalid character class
+invalid content of \{\}
+iter->cur.wc == 0
+mbsinit (&iter->state)
+mbuiter.h
+mbuiter_multi_next
+memory exhausted
+regular expression too big
+standard output
+stray \ before %lc
+stray \ before unprintable character
+stray \ before white space
+unbalanced (
+unbalanced )
+unbalanced [
+unfinished \ escape
+unlabeled
+write error
+{...} at start of expression

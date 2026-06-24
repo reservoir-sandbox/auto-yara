@@ -11,35 +11,51 @@ _EMAIL_PATTERN = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 
 def filter_strings(
     strings: list[dict[str, Any]],
+    whitelist: set[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Filters extracted strings using an allow-list strategy.
-
-    Keeps only strings that match known malware-relevant patterns
-    such as IP addresses, URLs, file system paths, and email addresses.
+    """Filters strings based on patterns and an optional whitelist.
 
     Args:
-        strings: List of string dictionaries from extract_strings(),
-            each containing 'value', 'section', and 'offset' keys.
+        strings: A list of dictionaries containing strings and their metadata.
+        whitelist: An optional set of strings to exclude from the results.
 
     Returns:
-        Filtered list containing only strings matching
-        at least one malware-relevant pattern.
+        A list of dictionaries containing filtered strings and their metadata.
     """
 
     filtered_strings = []
     for string in strings:
         value = string["value"]
 
-        if _IP_PATTERN.search(value):
-            filtered_strings.append(string)
-        elif _URL_PATTERN.search(value):
-            filtered_strings.append(string)
-        elif _PATH_PATTERN.search(value):
-            filtered_strings.append(string)
-        elif _EMAIL_PATTERN.search(value):
-            filtered_strings.append(string)
+        matched = (
+            _IP_PATTERN.search(value)
+            or _URL_PATTERN.search(value)
+            or _PATH_PATTERN.search(value)
+            or _EMAIL_PATTERN.search(value)
+        )
+
+        if not matched:
+            continue
+
+        if whitelist and value in whitelist:
+            continue
+
+        filtered_strings.append(string)
 
     return filtered_strings
+
+
+def load_whitelist(path: str) -> set[str]:
+    """Loads whitelist strings from a text file.
+
+    Args:
+        path: Path to the whitelist text file.
+
+    Returns:
+        Set of whitelisted strings.
+    """
+    with open(path, "r") as f:
+        return {line.strip() for line in f}
 
 
 if __name__ == "__main__":
@@ -52,10 +68,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output", required=True, help="Path to output JSON file"
     )
+    parser.add_argument(
+        "--whitelist",
+        default="whitelist/clean_strings.txt",
+        help="Path to whitelist file",
+    )
     args = parser.parse_args()
 
+    whitelist = load_whitelist(args.whitelist)
+
     data = {
-        "filtered_strings": filter_strings(extract_strings(args.input)),
+        "filtered_strings": filter_strings(
+            extract_strings(args.input), whitelist
+        ),
     }
 
     save_to_json(data, args.output)

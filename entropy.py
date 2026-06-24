@@ -39,6 +39,28 @@ def is_high_entropy(data: bytes, threshold: float = 7.0) -> bool:
     return entropy > threshold
 
 
+def classify_entropy(data: bytes) -> str:
+    """Classifies entropy into malware-relevant categories.
+
+    Args:
+        data: Raw bytes to analyze.
+
+    Returns:
+        A string classification of the entropy:
+            - "normal" for entropy < 6.5
+            - "suspicious" for 6.5 <= entropy < 7.0
+            - "likely_packed" for entropy >= 7.0
+    """
+    entropy = calculate_entropy(data)
+
+    if entropy < 6.5:
+        return "normal"
+    elif 6.5 <= entropy < 7.0:
+        return "suspicious"
+    else:
+        return "likely_packed"
+
+
 if __name__ == "__main__":
     from elftools.elf.elffile import ELFFile
 
@@ -54,7 +76,8 @@ if __name__ == "__main__":
                     continue
                 entropy = calculate_entropy(sec.data())
                 high = is_high_entropy(sec.data())
+                classification = classify_entropy(sec.data())
                 print(
-                    f"{path} | {section_name}: {entropy:.4f} |"
-                    f"high_entropy: {high}"
+                    f"{path} | {section_name}: {entropy:.4f} | "
+                    f"high_entropy: {high} | classification: {classification}"
                 )
