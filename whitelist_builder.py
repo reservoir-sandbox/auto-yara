@@ -28,7 +28,7 @@ def build_whitelist(directory: str, min_occurrences: int) -> set[str]:
             unique_in_file = set(s["value"] for s in strings)
             all_strings.extend(unique_in_file)
 
-    string_counts = Counter(all_strings)  # один раз, после всех файлов
+    string_counts = Counter(all_strings)
 
     return {
         string
@@ -52,6 +52,29 @@ def save_whitelist(whitelist: set[str], output_path: str) -> None:
 
 
 if __name__ == "__main__":
-    whitelist = build_whitelist(_SYSTEM_BINARIES_DIR, _MIN_OCCURRENCES)
-    save_whitelist(whitelist, "whitelist/clean_strings.txt")
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Build a string whitelist from clean system binaries"
+    )
+    parser.add_argument(
+        "--input",
+        default=_SYSTEM_BINARIES_DIR,
+        help="Directory containing clean ELF binaries",
+    )
+    parser.add_argument(
+        "--output",
+        default="whitelist/clean_strings.txt",
+        help="Path to output whitelist file",
+    )
+    parser.add_argument(
+        "--min-occurrences",
+        type=int,
+        default=_MIN_OCCURRENCES,
+        help="Minimum number of binaries a string must appear in",
+    )
+    args = parser.parse_args()
+
+    whitelist = build_whitelist(args.input, args.min_occurrences)
+    save_whitelist(whitelist, args.output)
     print(f"Whitelist size: {len(whitelist)}")
