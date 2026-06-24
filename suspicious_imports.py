@@ -32,6 +32,14 @@ def detect_suspicious_combinations(
         - memfd_create + execve: fileless execution (in-memory exec)
         - init_module: kernel module loading (potential rootkit)
 
+    Limitation:
+        Only effective on dynamically linked binaries. Statically
+        linked binaries (common in IoT malware such as Mirai) have
+        no .dynsym entries for these calls, since they are compiled
+        directly into the binary rather than imported at runtime.
+        Check extract_metadata()['is_static'] before relying on
+        this function's results.
+
     Args:
         imports: Dictionary mapping category names to lists of
             imported function names, as returned by extract_imports().
