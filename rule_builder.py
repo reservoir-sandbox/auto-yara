@@ -107,3 +107,12 @@ if __name__ == "__main__":
     print(rule_text)
     print()
     print("Valid:", builder.validate())
+
+    # Проверка матчинга на реальном файле
+    compiled_rule = yara.compile(source=rule_text)
+    matches = compiled_rule.match("corpus/malware/mirai.elf")
+    print("Matches on Mirai:", matches)
+
+    # Контрольная проверка — НЕ должно сработать на чистом бинаре
+    matches_clean = compiled_rule.match("corpus/clean/bat")
+    print("Matches on bat (should be empty):", matches_clean)
