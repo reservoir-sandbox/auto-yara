@@ -1,5 +1,8 @@
+from elf_parser import parse_header
 from rule_builder import YaraRuleBuilder
 from string_filter import filter_strings
+from elftools.elf.elffile import ELFFile
+from entropy import classify_entropy
 
 _ELF_MAGIC_CHECK = "uint32(0) == 0x464C457F"
 
@@ -22,6 +25,42 @@ def build_string_condition(num_strings: int) -> str:
         return "2 of ($s*)"
 
 
+def build_arch_condition(elf_path: str) -> str:
+    """Builds an architecture-check condition based on the binary's
+    machine type, using the project's own ELF header parser.
+
+    Args:
+        elf_path: Path to the ELF binary.
+
+    Returns:
+        A YARA condition fragment like "elf.machine == elf.EM_X86_64".
+    """
+    header = parse_header(elf_path)
+    architecture = header["architecture"]
+    return f"elf.machine == elf.{architecture}"
+
+
+def get_rodata_entropy_label(elf_path: str) -> str:
+    """Classifies the entropy of the .rodata section.
+
+    Args:
+        elf_path: Path to the ELF binary.
+
+    Returns:
+        Entropy classification string ("normal", "suspicious",
+        or "likely_packed"), or "unknown" if .rodata is absent.
+    """
+    with open(elf_path, "rb") as f:
+        elf = ELFFile(f)
+        rodata_section = elf.get_section_by_name(".rodata")
+        if not rodata_section:
+            return "unknown"
+
+        data = rodata_section.data()
+
+    return classify_entropy(data)
+
+
 def build_rule_from_features(
     elf_path: str,
     rule_name: str,
@@ -38,18 +77,23 @@ def build_rule_from_features(
     """
     builder = YaraRuleBuilder(rule_name)
     builder.set_meta("author", "auto-yara")
+    builder.set_meta("entropy", get_rodata_entropy_label(elf_path))
 
     for index, string in enumerate(filtered_strings, start=1):
         builder.add_string(f"s{index}", string["value"])
 
     string_condition = build_string_condition(len(filtered_strings))
+    arch_condition = build_arch_condition(elf_path)
 
     if string_condition:
-        full_condition = f"{_ELF_MAGIC_CHECK} and {string_condition}"
+        full_condition = (
+            f"{_ELF_MAGIC_CHECK} and {arch_condition} and {string_condition}"
+        )
     else:
-        full_condition = _ELF_MAGIC_CHECK
+        full_condition = f"{_ELF_MAGIC_CHECK} and {arch_condition}"
 
     builder.set_condition(full_condition)
+    builder.add_import("elf")
 
     return builder
 
@@ -94,3 +138,6 @@ if __name__ == "__main__":
     compiled = yara.compile(source=rule_text)
     clean_matches = compiled.match("corpus/clean/bat")
     print("False positive check on bat:", clean_matches)
+
+    mirai_matches = compiled.match(args.input)
+    print("Matches on the analyzed file itself:", mirai_matches)

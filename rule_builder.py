@@ -11,6 +11,15 @@ class YaraRuleBuilder:
         self.strings: list[tuple[str, str, str]] = []  # id, value, modifiers
         self.hex_patterns: list[tuple[str, str]] = []  # id, hex bytes
         self.condition: str = ""
+        self.imports: set[str] = set()
+
+    def add_import(self, module_name: str) -> None:
+        """Adds a YARA module import (e.g. "math", "elf", "pe").
+
+        Args:
+            module_name: Name of the YARA module to import.
+        """
+        self.imports.add(module_name)
 
     def add_string(
         self, identifier: str, value: str, modifiers: str = ""
@@ -53,7 +62,16 @@ class YaraRuleBuilder:
 
     def build(self) -> str:
         """Builds the complete YARA rule text."""
-        lines = [f"rule {self.rule_name}", "{"]
+        lines = []
+
+        for module in sorted(self.imports):
+            lines.append(f'import "{module}"')
+
+        if self.imports:
+            lines.append("")
+
+        lines.append(f"rule {self.rule_name}")
+        lines.append("{")
 
         if self.meta:
             lines.append("    meta:")
@@ -94,9 +112,13 @@ class YaraRuleBuilder:
 
 if __name__ == "__main__":
     builder = YaraRuleBuilder("ExampleRule")
+    builder.add_import("math")
     builder.set_meta("author", "auto-yara")
     builder.add_string("s1", "example string")
-    builder.set_condition("uint32(0) == 0x464C457F and 1 of ($s*)")
+    builder.set_condition(
+        "uint32(0) == 0x464C457F and 1 of ($s*) and "
+        "math.entropy(0, filesize) > 7.0"
+    )
 
-    print(builder.build())
+    print(repr(builder.build()))
     print("Valid:", builder.validate())
