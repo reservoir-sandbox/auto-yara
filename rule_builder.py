@@ -93,24 +93,10 @@ class YaraRuleBuilder:
 
 
 if __name__ == "__main__":
-    builder = YaraRuleBuilder("ELF_Mirai_x86_Test")
+    builder = YaraRuleBuilder("ExampleRule")
     builder.set_meta("author", "auto-yara")
-    builder.set_meta("family", "Mirai")
+    builder.add_string("s1", "example string")
+    builder.set_condition("uint32(0) == 0x464C457F and 1 of ($s*)")
 
-    builder.add_string("s1", "wget -O /tmp/dvrHelper http://")
-    builder.add_string("s2", "/etc/config/resolv.conf")
-    builder.add_string("s3", "/etc/config/hosts")
-
-    builder.set_condition("uint32(0) == 0x464C457F and 2 of ($s*)")
-
-    rule_text = builder.build()
-    print(rule_text)
-    print()
+    print(builder.build())
     print("Valid:", builder.validate())
-
-    compiled_rule = yara.compile(source=rule_text)
-    matches = compiled_rule.match("corpus/malware/mirai.elf")
-    print("Matches on Mirai:", matches)
-
-    matches_clean = compiled_rule.match("corpus/clean/bat")
-    print("Matches on bat (should be empty):", matches_clean)
