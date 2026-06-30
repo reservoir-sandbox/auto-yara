@@ -22,7 +22,7 @@ Generates a complete, syntax-validated YARA rule from a raw ELF binary
 in one command. Internally it extracts strings, filters them against
 known malware-relevant patterns and a clean-binary whitelist, and
 assembles a rule with a condition that adapts to how many indicators
-were found.
+were found, plus a dynamically detected architecture check.
 
 **Usage**
 
@@ -35,21 +35,24 @@ python main.py --input <path_to_elf> --name <rule_name> --output <path_to_yar>
 | Argument | Required | Description |
 |---|---|---|
 | `--input` | Yes | Path to the ELF binary to analyze |
-| `--name` | Yes | Name to give the generated YARA rule |
-| `--output` | Yes | Path to save the generated `.yar` file |
+| `--name` | Yes, unless `--features-only` | Name to give the generated YARA rule (architecture is auto-appended, e.g. `Mirai` becomes `Mirai_EM_386`) |
+| `--output` | Yes, unless `--features-only` | Path to save the generated `.yar` file |
 | `--whitelist` | No | Path to clean-string whitelist (default: `whitelist/clean_strings.txt`) |
+| `--features-only` | No | Skip rule generation; print all extracted features as JSON instead |
 
 **Example**
 
 ```bash
-python main.py --input corpus/malware/mirai.elf --name ELF_Mirai_Auto --output output/mirai_auto.yar
+python main.py --input corpus/malware/mirai.elf --name Mirai --output output/mirai_auto.yar
 ```
 
 ```yara
-rule ELF_Mirai_Auto
+import "elf"
+rule Mirai_EM_386
 {
     meta:
         author = "auto-yara"
+        entropy = "normal"
 
     strings:
         $s1 = "wget -O /tmp/dvrHelper http://"
@@ -60,7 +63,7 @@ rule ELF_Mirai_Auto
         $s6 = "/etc/config/hosts"
 
     condition:
-        uint32(0) == 0x464C457F and 2 of ($s*)
+        uint32(0) == 0x464C457F and elf.machine == elf.EM_386 and 2 of ($s*)
 }
 ```
 
@@ -68,12 +71,62 @@ rule ELF_Mirai_Auto
 
 | Strings found | Condition used |
 |---|---|
-| 0 | `uint32(0) == 0x464C457F` only |
-| 1 | `... and 1 of ($s*)` |
-| 2+ | `... and 2 of ($s*)` |
+| 0 | `magic and arch` only |
+| 1 | `magic and arch and 1 of ($s*)` |
+| 2+ | `magic and arch and 2 of ($s*)` |
+
+Architecture is detected automatically from the binary's ELF header
+(`elf.machine == elf.EM_X86_64`, `elf.EM_386`, etc.) rather than
+hardcoded — this matters because a fixed architecture check would
+silently break detection on binaries compiled for a different
+architecture than expected.
 
 Every generated rule is validated for syntax correctness via
-`yara-python` before being saved to disk.
+`yara-python` before being saved.
+
+**--features-only mode**
+
+For debugging or inspection without generating a rule, run with
+`--features-only` to print every extracted feature as JSON:
+
+```bash
+python main.py --input corpus/malware/mirai.elf --features-only
+```
+
+```json
+{
+    "strings_filtered": [...],
+    "imports": {
+        "network": [], "process": [], "memory": [], "antidebug": [],
+        "filesystem": [], "privileges": [], "other": []
+    },
+    "metadata": {
+        "is_stripped": false, "has_upx": false, "has_rwx_segment": false,
+        "has_exec_stack": false, "is_static": true
+    },
+    "rodata_entropy": "normal",
+    "suspicious_imports": []
+}
+```
+
+> Note: statically linked binaries (like the Mirai sample above) will
+> show empty `imports` and `suspicious_imports` — this is expected,
+> not a bug. See [suspicious_imports.py](#suspicious_importspy) for why.
+
+**Known limitations (MVP scope)**
+
+- **Hex byte patterns**: `YaraRuleBuilder.add_hex_pattern()` exists
+  and is tested, but `main.py` doesn't generate hex patterns
+  automatically. A simple "first N bytes of the file" approach was
+  considered and rejected — it just duplicates the existing ELF
+  magic check without adding signal. Meaningful hex patterns would
+  require disassembly-level analysis of unique malware code/data,
+  which is out of scope for this MVP.
+- **Batch mode**: only a single binary can be analyzed per run.
+  Generating one rule from multiple samples of the same malware
+  family (to capture variant-resistant indicators) was deferred —
+  with only one real malware sample available for testing, this
+  logic couldn't be meaningfully validated.
 
 ---
 
