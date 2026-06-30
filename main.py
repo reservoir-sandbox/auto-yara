@@ -25,18 +25,16 @@ def build_string_condition(num_strings: int) -> str:
         return "2 of ($s*)"
 
 
-def build_arch_condition(elf_path: str) -> str:
-    """Builds an architecture-check condition based on the binary's
-    machine type, using the project's own ELF header parser.
+def build_arch_condition(architecture: str) -> str:
+    """Builds an architecture-check condition.
 
     Args:
-        elf_path: Path to the ELF binary.
+        architecture: Machine type string from parse_header()
+            (e.g. "EM_X86_64", "EM_386").
 
     Returns:
         A YARA condition fragment like "elf.machine == elf.EM_X86_64".
     """
-    header = parse_header(elf_path)
-    architecture = header["architecture"]
     return f"elf.machine == elf.{architecture}"
 
 
@@ -66,15 +64,10 @@ def build_rule_from_features(
     rule_name: str,
     filtered_strings: list[dict[str, str]],
 ) -> YaraRuleBuilder:
-    """Builds a YARA rule from the provided ELF file features.
+    """..."""
+    architecture = parse_header(elf_path)["architecture"]
+    rule_name = f"{rule_name}_{architecture}"
 
-    Args:
-        elf_path: Path to the ELF file.
-        rule_name: Name of the YARA rule to be created.
-        filtered_strings: List of filtered strings to include in the rule.
-    Returns:
-        An instance of YaraRuleBuilder containing the constructed rule.
-    """
     builder = YaraRuleBuilder(rule_name)
     builder.set_meta("author", "auto-yara")
     builder.set_meta("entropy", get_rodata_entropy_label(elf_path))
@@ -83,7 +76,7 @@ def build_rule_from_features(
         builder.add_string(f"s{index}", string["value"])
 
     string_condition = build_string_condition(len(filtered_strings))
-    arch_condition = build_arch_condition(elf_path)
+    arch_condition = build_arch_condition(architecture)
 
     if string_condition:
         full_condition = (
@@ -100,22 +93,32 @@ def build_rule_from_features(
 
 if __name__ == "__main__":
     import argparse
-    import yara  # type: ignore[import-not-found]
-    from feature_extractor import extract_strings
+    import json
+    from feature_extractor import (
+        extract_strings,
+        extract_imports,
+        extract_metadata,
+    )
     from string_filter import load_whitelist
+    from suspicious_imports import detect_suspicious_combinations
 
     parser = argparse.ArgumentParser(
         description="Generate a YARA rule from an ELF binary"
     )
     parser.add_argument("--input", required=True, help="Path to ELF binary")
-    parser.add_argument("--name", required=True, help="Name for the YARA rule")
+    parser.add_argument("--name", required=False, help="Name for the YARA rule")
     parser.add_argument(
-        "--output", required=True, help="Path to save the .yar file"
+        "--output", required=False, help="Path to save the .yar file"
     )
     parser.add_argument(
         "--whitelist",
         default="whitelist/clean_strings.txt",
         help="Path to whitelist file",
+    )
+    parser.add_argument(
+        "--features-only",
+        action="store_true",
+        help="Only extract and print features, skip rule generation",
     )
     args = parser.parse_args()
 
@@ -123,21 +126,28 @@ if __name__ == "__main__":
     raw_strings = extract_strings(args.input)
     filtered = filter_strings(raw_strings, whitelist)
 
-    builder = build_rule_from_features(args.input, args.name, filtered)
+    if args.features_only:
+        imports = extract_imports(args.input)
+        features = {
+            "strings_filtered": filtered,
+            "imports": imports,
+            "metadata": extract_metadata(args.input),
+            "rodata_entropy": get_rodata_entropy_label(args.input),
+            "suspicious_imports": detect_suspicious_combinations(imports),
+        }
+        print(json.dumps(features, indent=4))
+    else:
+        if not args.name or not args.output:
+            parser.error(
+                "--name and --output are required unless --features-only is set"
+            )
 
-    rule_text = builder.build()
-    print(rule_text)
-    print()
-    print("Valid:", builder.validate())
+        builder = build_rule_from_features(args.input, args.name, filtered)
+        rule_text = builder.build()
 
-    with open(args.output, "w") as f:
-        f.write(rule_text)
-
-    print(f"Rule saved to {args.output}")
-
-    compiled = yara.compile(source=rule_text)
-    clean_matches = compiled.match("corpus/clean/bat")
-    print("False positive check on bat:", clean_matches)
-
-    mirai_matches = compiled.match(args.input)
-    print("Matches on the analyzed file itself:", mirai_matches)
+        with open(args.output, "w") as f:
+            f.write(rule_text)
+        print(rule_text)
+        print()
+        print("Valid:", builder.validate())
+        print(f"Rule saved to {args.output}")
