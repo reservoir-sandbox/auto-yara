@@ -13,10 +13,8 @@ env/
 # IDE
 .vscode/settings.json
 
-# Project
-corpus/
-output/
-*.yar
+# Project — system binaries are large and OS-specific, exclude them
+corpus/clean_system/
 
 # OS
 .DS_Store

