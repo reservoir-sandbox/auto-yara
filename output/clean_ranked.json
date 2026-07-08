@@ -1,0 +1,1119 @@
+{
+    "ranked_strings": [
+        {
+            "value": "ageAgealphabeticasciihexdigitbcBidi_ClassbidicbidiclassbidicontrolbidimbidimirroredbidimirroringglyphBidi_Mirroring_GlyphbidipairedbracketBidi_Paired_BracketbidipairedbrackettypeBidi_Paired_Bracket_TypeblkBlockblockbmgbpbbptcanonicalcombiningclassCanonical_Combining_ClasscasedcasefoldingCase_FoldingcaseignorablecccceComposition_ExclusionchangeswhencasefoldedchangeswhencasemappedchangeswhenlowercasedchangeswhennfkccasefoldedChanges_When_NFKC_CasefoldedchangeswhentitlecasedchangeswhenuppercasedcicjkaccountingnumerickAccountingNumericcjkcompatibilityvariantkCompatibilityVariantcjkiicorekIICorecjkirggsourcekIRG_GSourcecjkirghsourcekIRG_HSourcecjkirgjsourcekIRG_JSourcecjkirgkpsourcekIRG_KPSourcecjkirgksourcekIRG_KSourcecjkirgmsourcekIRG_MSourcecjkirgssourcekIRG_SSourcecjkirgtsourcekIRG_TSourcecjkirguksourcekIRG_UKSourcecjkirgusourcekIRG_USourcecjkirgvsourcekIRG_VSourcecjkothernumerickOtherNumericcjkprimarynumerickPrimaryNumericcjkrsunicodekRSUnicodecompexFull_Composition_ExclusioncompositionexclusioncwkcfcwlcwtcwudecompositionmappingDecomposition_MappingdecompositiontypeDecomposition_TypedefaultignorablecodepointdepdeprecateddidiadiacriticdmdteaeastasianwidthebaseecompemojiemojicomponentemojimodifieremojimodifierbaseemojipresentationepresequideoEquivalent_Unified_IdeographequivalentunifiedideographexpandsonnfcExpands_On_NFCexpandsonnfdExpands_On_NFDexpandsonnfkcExpands_On_NFKCexpandsonnfkdExpands_On_NFKDextextendedpictographicextpictfcnfkcFC_NFKC_ClosurefcnfkcclosurefullcompositionexclusiongcgcbGrapheme_Cluster_BreakgeneralcategorygraphemebasegraphemeclusterbreakgraphemeextendgraphemelinkgrbasegrextgrlinkhangulsyllabletypeHangul_Syllable_TypehexhsthyphenidcidcompatmathcontinueidcompatmathstartidcontinueideographicidsidsbinaryoperatoridstartidstrinaryoperatorIndic_Conjunct_BreakindicconjunctbreakindicpositionalcategoryIndic_Positional_CategoryindicsyllabiccategoryIndic_Syllabic_CategoryiscISO_CommentjamoshortnameJamo_Short_NamejgJoining_GroupjoincjoincontroljoininggroupjoiningtypeJoining_TypejsnjtkaccountingnumerickcompatibilityvariantkehcatkEH_CatkehdesckehhgkEH_HGkehifaokEH_JSeshkehnomirrorkEH_NoMirrorkehnorotatekEH_NoRotatekiicorekirggsourcekirghsourcekirgjsourcekirgkpsourcekirgksourcekirgmsourcekirgssourcekirgtsourcekirguksourcekirgusourcekirgvsourcekothernumerickprimarynumerickrsunicodelbLine_BreakLowercase_Mappinglinebreakloelogicalorderexceptionlowercasemcmmodifiercombiningmarknana1Unicode_1_NamenamealiasName_AliasncharnfcqcNFC_Quick_ChecknfcquickchecknfdqcNFD_Quick_ChecknfdquickchecknfkccasefoldNFKC_CasefoldnfkccfnfkcqcnfkcquickchecknfkcscfNFKC_Simple_CasefoldnfkcsimplecasefoldnfkdqcnfkdquickchecknoncharactercodepointntNumeric_TypenumerictypenumericvalueNumeric_ValuenvoalphaodiogrextoloweromathotheralphabeticotherdefaultignorablecodepointothergraphemeextendotheridcontinueotheridstartotherlowercaseothermathotheruppercaseoupperpatsynpatternsyntaxpatternwhitespacepatwspcmprependedconcatenationmarkqmarkquotationmarkradicalregionalindicatorrisbSentence_BreakscfSimple_Case_FoldingscriptScript_ExtensionsscxsdsentencebreaksfcsimplecasefoldingsimplelowercasemappingSimple_Lowercase_MappingsimpletitlecasemappingSimple_Titlecase_MappingsimpleuppercasemappingSimple_Uppercase_MappingslcsoftdottedstcstermsuctcTitlecase_MappingterminalpunctuationucUppercase_Mappinguideounicode1nameunicoderadicalstrokeuppercaseursvariationselectorverticalorientationVertical_OrientationvovswbWord_Breakwhitespacewordbreakwspacexidcontinuexonfcxonfdxonfkcxonfkd1.1V10_0V11_0V12_0V12_1V13_0V14_0V15_0V15_1V16_02.02.13.03.13.24.04.15.05.15.26.06.16.26.37.08.09.0Unassignedunassignedv11v20v21v30v31v32v40v41v50v51v52v60v61v62v63v70v80v90ccasedletterCased_LetterccControlFormatClose_PunctuationcncoPrivate_UsecombiningmarkconnectorpunctuationConnector_PunctuationcontrolcsSurrogatecurrencysymbolCurrency_SymboldashpunctuationdecimalnumberenclosingmarkEnclosing_MarkFinal_PunctuationformatinitialpunctuationInitial_PunctuationlLetterletterletternumberLetter_NumberlineseparatorLine_SeparatorlllmModifier_LetterloOther_LetterlowercaseletterltlumathsymbolMath_SymbolmcSpacing_MarkmemnNonspacing_MarkmodifierlettermodifiersymbolModifier_SymbolnNumberndnlnoOther_NumbernonspacingmarknumberopenpunctuationotherotherletterothernumberOther_PunctuationothersymbolOther_SymbolpPunctuationparagraphseparatorParagraph_SeparatorpcpdpepfpipoprivateusepspunctuationSymbolSeparatorsksmsospaceseparatorSpace_SeparatorspacingmarksurrogatesymboltitlecaseletteruppercaseletterzzlzpzscrCRebE_BaseE_Base_GAZebgemE_ModifieremodifierexExtendextendgazGlue_After_ZwjglueafterzwjLlfLFlvLVlvtLVTppPrependprependSpacingMarktTvVxxzwjZWJadlamAdlamCaucasian_AlbaniananatolianhieroglyphsAnatolian_HieroglyphsArabicarabicavestanAvestanBamumbamumBassa_VahbatakBatakBengalibengalibhaiksukiBhaiksukiBrahmibrahmiBraillebrailleBuhidbuhidChakmacanadianaboriginalCanadian_AboriginalCariancariancaucasianalbanianchakmachorasmianChorasmiancommonCommonCopticcopticCypro_MinoanCypriotcuneiformCuneiformcypriotcyprominoandeseretDeseretDevanagaridevanagariDives_AkurudivesakuruDogradograEgyptian_HieroglyphsegyptianhieroglyphsElbasanelbasanElymaicelymaicGaraygarayGlagoliticglagoliticGunjala_GondiMasaram_GondiGothicgothicGranthagranthagreekGreekGurung_KhemagunjalagondigurungkhemahanHanHangulhangulhanifirohingyaHanifi_RohingyaHanunoohanunooHatranhatranHebrewhebrewPahawh_HmongNyiakeng_Puachue_HmongKatakana_Or_HiraganaOld_HungarianimperialaramaicinheritedInheritedinscriptionalpahlaviInscriptional_PahlaviinscriptionalparthianInscriptional_ParthianOld_ItalickaithiKaithikannadaKannadakatakanaorhiraganakayahliKharoshthikharoshthikhitansmallscriptKhitan_Small_ScriptkhmerKhmerKhojkikhojkikhudawadiKhudawadiKirat_RailaoLaolatinLatinLepchalepchaLimbulimbulinearalinearbLycianlycianLydianlydianMakasarmakasarmalayalamMalayalamMandaicmandaicManichaeanmanichaeanMarchenmarchenmasaramgondimedefaidrinMedefaidrinmeeteimayekMeetei_MayekMende_KikakuimendekikakuiMeroitic_HieroglyphsmeroiticcursivemeroitichieroglyphsMongolianmongolianmroMroMultanimultanimyanmarMyanmarnabataeanNabataeanNag_MundarinagmundariNandinagarinandinagariOld_North_ArabiannewtailueNew_Tai_LuenkoNkoNushunushunyiakengpuachuehmongOghamoghamolchikioldhungarianolditalicoldnortharabianoldpermicOld_PermicoldpersianOld_PersianoldsogdianOld_SogdianoldsoutharabianOld_South_ArabianoldturkicOld_TurkicolduyghurOld_UyghurolonalOl_OnaloriyaOriyaosageOsageOsmanyaosmanyapahawhhmongPalmyrenepalmyrenePau_Cin_HaupaucinhauphagspaPsalter_PahlaviPhoenicianphoenicianpsalterpahlavirejangRejangrunicRunicsamaritanSamaritanSaurashtrasaurashtraSignWritingsharadaSharadashavianShavianSiddhamsiddhamsignwritingSinhalasinhalaSogdiansogdianSora_SompengsorasompengSoyombosoyomboSundanesesundaneseSunuwarsunuwarSyloti_NagrisylotinagriSyriacsyriactagalogTagalogtaileTai_LetaithamtaivietTakritakritamilTamilTanguttangsaTangsatangutTeluguteluguThaanathaanatibetanTibetanTirhutatirhutatodhriTodhritulutigalariTulu_TigalariUnknownvaiVaiwanchoWanchoWarang_CitiwarangcitiYezidiyezidiyiYizanabazarsquareatATermatermclCloseclosefoleOLetterLowernuNumericnumericoletterSContinuescontinueseSepsepspSpstSTermupUpperaletterALetterdoublequoteDouble_QuotedqExtendNumLetextendnumlethebrewletterHebrew_LetterhlkambMidNumLetmidletterMidLettermidnumMidNummidnumletmlnewlineNewlinesinglequoteSingle_QuotesqwsegspaceWSegSpace which occurs before last codepoint U+assertion failed: i > self.nextassertion failed: start <= endASCII",
+            "section": ".rodata",
+            "offset": "0x55418c",
+            "score": 7.5
+        },
+        {
+            "value": "DashInCBMathahexcwcfcwcmdashemodideoidsbidstidsuincbinpcinscmathNameoidcoidstermxidcxidsV1_110.011.012.012.113.014.015.015.116.0V2_0V2_1V3_0V3_1V3_2V4_0V4_1V5_0V5_1V5_2V6_0V6_1V6_2V6_3V7_0V8_0V9_0v100v110v120v121v130v140v150v151v160adlmaghbahomAhomarabarmiarmnavstbalibamubassbatkbengbhksbopobrahbraibugibuhdcakmcanscarichamChamcherchrscoptcpmncprtcyrldevadiakdogrdsrtduplegypelbaelymethigarageorglaggonggonmgothgrangrekgujrgukhguruhanghanihanohatrhebrhirahluwhmnghmnphrkthungitaljavakalikanakawiKawikharkhmrkhojkitskndakraikthilanalaoolatnlepclimblinalinblisuLisulycilydimahjmakamandmanimarcmedfmendmercmeromiaoMiaomlymmodiModimongmroomteimultmymrnagmnandnarbnbatnewaNewankoonshuogamolckonaoorkhoryaosgeosmaougrpalmpaucpermphagphliphlpphnxplrdprtiqaacqaairjngrohgrunrsamrsarbsaursgnwshawshrdsiddsindsinhsogdsogosorasoyosundsunusylosyrctagbtakrtaletalutamltangtavttelutfngtglgthaathaiThaitibttirhtnsatodrtotoTototutgugarvaiivithwarawchoxpeoxsuxyeziyiiizanbzinhzyyyzzzzLook",
+            "section": ".rodata",
+            "offset": "0x3e375c",
+            "score": 5.0
+        },
+        {
+            "value": "  https://github.com/sharkdp/bat#adding-new-themes (default) (default dark)source0.26.1",
+            "section": ".rodata",
+            "offset": "0x3f2cbd",
+            "score": 5.0
+        },
+        {
+            "value": "# Requires https://github.com/scop/bash-completion",
+            "section": ".rodata",
+            "offset": "0x3f3354",
+            "score": 5.0
+        },
+        {
+            "value": "## See https://github.com/sharkdp/bat/issues/2085#issuecomment-1271646802",
+            "section": ".rodata",
+            "offset": "0x3f4771",
+            "score": 5.0
+        },
+        {
+            "value": "## See https://github.com/sharkdp/bat/issues/2085#issuecomment-1271646802",
+            "section": ".rodata",
+            "offset": "0x3f6dcb",
+            "score": 5.0
+        },
+        {
+            "value": "        ## See https://github.com/sharkdp/bat/issues/2085#issuecomment-1271646802",
+            "section": ".rodata",
+            "offset": "0x3fd041",
+            "score": 5.0
+        },
+        {
+            "value": "  https://github.com/sharkdp/bat#adding-new-syntaxes--language-definitionsA config file already exists at: Overwrite? (y/N): # This is `bat`s configuration file. Each line either contains a comment or",
+            "section": ".rodata",
+            "offset": "0x3fd313",
+            "score": 5.0
+        },
+        {
+            "value": "ERROR: License is of unknown type: Copyright (c) 2018-2021 bat-developers (https://github.com/sharkdp/bat).",
+            "section": ".rodata",
+            "offset": "0x402533",
+            "score": 5.0
+        },
+        {
+            "value": "\\s +## acknowledgements is not the empty stringThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.Redistributions in binary form must reproduce the above copyright notice,Apache License Version 2.0, January 2004 http://www.apache.org/licenses/Licensed under the Apache License, Version 2.0 (the \"License\");Creative Commons Attribution 4.0 International Public LicenseThis is free and unencumbered software released into the public domain.DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSEPermission to copy, use, modify, sell and distribute this software is granted. This software is provided \"as is\" without express or implied warranty, and with no claim as to its suitability for any purpose.Could not serialize Some referenced contexts could not be found!",
+            "section": ".rodata",
+            "offset": "0x402650",
+            "score": 5.0
+        },
+        {
+            "value": "  # http://erlang.org/doc/reference_manual/typespec.html#the-erlang-type-language",
+            "section": ".rodata",
+            "offset": "0x41c72a",
+            "score": 5.0
+        },
+        {
+            "value": "  # http://erlang.org/doc/man/erlang.html#data-types",
+            "section": ".rodata",
+            "offset": "0x41c91a",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://github.com/erlang/otp",
+            "section": ".rodata",
+            "offset": "0x41cb9f",
+            "score": 5.0
+        },
+        {
+            "value": "  # http://groovy-lang.org/syntax.html#_normal_identifiers",
+            "section": ".rodata",
+            "offset": "0x42566c",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts",
+            "section": ".rodata",
+            "offset": "0x426b54",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://mimesniff.spec.whatwg.org/#javascript-mime-type",
+            "section": ".rodata",
+            "offset": "0x426f4e",
+            "score": 5.0
+        },
+        {
+            "value": "    | \\s*<([\\w-]+):Envelope\\s+xmlns:\\1\\s*=\\s*\"http://schemas.xmlsoap.org/soap/envelope/\"\\s*>",
+            "section": ".rodata",
+            "offset": "0x4729a2",
+            "score": 5.0
+        },
+        {
+            "value": "  (?:::(?:ffff(?::0{1,4}){0,1}:){0,1}{{ipv4}})          # ::255.255.255.255  ::ffff:255.255.255.255  ::ffff:0:255.255.255.255 (IPv4-mapped IPv6 addresses and IPv4-translated addresses)",
+            "section": ".rodata",
+            "offset": "0x48ff18",
+            "score": 5.0
+        },
+        {
+            "value": "  |(?:(?:[0-9a-f]{1,4}:){1,4}:{{ipv4}})                 # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33                       (IPv4-Embedded IPv6 Address)",
+            "section": ".rodata",
+            "offset": "0x48ffd1",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts",
+            "section": ".rodata",
+            "offset": "0x4d0076",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://mimesniff.spec.whatwg.org/#javascript-mime-type",
+            "section": ".rodata",
+            "offset": "0x4d0470",
+            "score": 5.0
+        },
+        {
+            "value": "  # https://mimesniff.spec.whatwg.org/#javascript-mime-type",
+            "section": ".rodata",
+            "offset": "0x4e6ecc",
+            "score": 5.0
+        },
+        {
+            "value": "  |172\\.{{sixteen_to_31}}(?:\\.{{zero_to_255}}){2}  # 172.16.0.0 - 172.31.255.255",
+            "section": ".rodata",
+            "offset": "0x4eaa9b",
+            "score": 5.0
+        },
+        {
+            "value": "  ::(?:ffff(?::0{1,4}){0,1}:){0,1}{{ipv4}}          # ::255.255.255.255  ::ffff:255.255.255.255  ::ffff:0:255.255.255.255 (IPv4-mapped IPv6 addresses and IPv4-translated addresses)",
+            "section": ".rodata",
+            "offset": "0x4eab48",
+            "score": 5.0
+        },
+        {
+            "value": "  |(?:[0-9a-f]{1,4}:){1,4}:{{ipv4}}                 # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33                       (IPv4-Embedded IPv6 Address)",
+            "section": ".rodata",
+            "offset": "0x4eabfd",
+            "score": 5.0
+        },
+        {
+            "value": "  (?:::(?:ffff(?::0{1,4}){0,1}:){0,1}{{ipv4}})          # ::255.255.255.255  ::ffff:255.255.255.255  ::ffff:0:255.255.255.255 (IPv4-mapped IPv6 addresses and IPv4-translated addresses)",
+            "section": ".rodata",
+            "offset": "0x4ed5f4",
+            "score": 5.0
+        },
+        {
+            "value": "  |(?:(?:[0-9a-f]{1,4}:){1,4}:{{ipv4}})                 # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33                       (IPv4-Embedded IPv6 Address)",
+            "section": ".rodata",
+            "offset": "0x4ed6ad",
+            "score": 5.0
+        },
+        {
+            "value": "Fatal internal error. Please consider filing a bug report at https://github.com/clap-rs/clap/issues",
+            "section": ".rodata",
+            "offset": "0x50ce30",
+            "score": 5.0
+        },
+        {
+            "value": "T9U@UcULU.U\\UEUVUWU8U3U]U",
+            "section": ".rodata",
+            "offset": "0x53613b",
+            "score": 5.0
+        },
+        {
+            "value": "/usr/lib/debug/.build-id//usr/lib/debug/.debug_abbrev.dwo.debug_cu_index.debug_info.dwo.debug_line.dwo.debug_loc.dwo.debug_loclists.dwo.debug_macinfo.dwo.debug_rnglists.dwo.debug_str.dwo.debug_str_offsets.dwo.debug_tu_index.gnu_debuglinkfailed to create whole treestream did not contain valid UTF-8a formatting trait implementation returned an error when the underlying stream did notOsmessagepermission deniedconnection refusednetwork unreachableconnection abortednot connectedaddress in useaddress not availablenetwork downbroken pipeentity already existsoperation would blocknot a directoryis a directorydirectory not emptyread-only filesystem or storage mediumfilesystem loop or indirection limit (e.g. symlink loop)stale network file handleinvalid input parameterinvalid datatimed outwrite zeroseek on unseekable filequota exceededfile too largeresource busyexecutable file busycross-device link or renametoo many linksargument list too longoperation interruptedunsupportedunexpected end of fileout of memoryin progressother erroruncategorized errorstdoutstderrfailed printing to advancing io slices beyond their lengthadvancing IoSlice beyond its lengthfailed to allocate read bufferfile descriptor did not correspond to a Unix socketfatal runtime error: initialization or cleanup bug, aborting",
+            "section": ".rodata",
+            "offset": "0x578c03",
+            "score": 2.0
+        },
+        {
+            "value": "/usr/share/git-core/templates",
+            "section": ".rodata",
+            "offset": "0x587ab3",
+            "score": 2.0
+        },
+        {
+            "value": "/dev/urandom",
+            "section": ".rodata",
+            "offset": "0x588d08",
+            "score": 2.0
+        }
+    ],
+    "ranked_imports": [
+        {
+            "name": "waitpid",
+            "category": "process",
+            "score": 1.5
+        },
+        {
+            "name": "execvp",
+            "category": "process",
+            "score": 1.5
+        },
+        {
+            "name": "fork",
+            "category": "process",
+            "score": 1.5
+        },
+        {
+            "name": "mmap",
+            "category": "memory",
+            "score": 1.5
+        },
+        {
+            "name": "munmap",
+            "category": "memory",
+            "score": 1.5
+        },
+        {
+            "name": "mprotect",
+            "category": "memory",
+            "score": 1.5
+        },
+        {
+            "name": "dlsym",
+            "category": "memory",
+            "score": 1.5
+        },
+        {
+            "name": "recv",
+            "category": "network",
+            "score": 1.0
+        },
+        {
+            "name": "send",
+            "category": "network",
+            "score": 1.0
+        },
+        {
+            "name": "chroot",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "getuid",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "geteuid",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "setgroups",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "setgid",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "setuid",
+            "category": "privileges",
+            "score": 1.0
+        },
+        {
+            "name": "unlink",
+            "category": "filesystem",
+            "score": 0.5
+        },
+        {
+            "name": "mkdir",
+            "category": "filesystem",
+            "score": 0.5
+        },
+        {
+            "name": "write",
+            "category": "filesystem",
+            "score": 0.5
+        },
+        {
+            "name": "chmod",
+            "category": "filesystem",
+            "score": 0.5
+        },
+        {
+            "name": "open",
+            "category": "filesystem",
+            "score": 0.5
+        },
+        {
+            "name": "__ctype_toupper_loc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getenv",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "dl_iterate_phdr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_attr_getguardsize",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__snprintf_chk",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "free",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_create",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strcasecmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawn_file_actions_init",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_detach",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "abort",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_Backtrace",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__errno_location",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_getattr_np",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "ldexp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strncmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnattr_setpgroup",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_exit",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sendmsg",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "writev",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "isatty",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sigaction",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__cxa_thread_atexit_impl",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__xpg_strerror_r",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "readlink",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "fcntl",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetRegionStart",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnattr_destroy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getpid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetTextRelBase",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_RaiseException",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_rwlock_init",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getpeername",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawn_file_actions_destroy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__xstat64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "opendir",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "rmdir",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strlen",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__lxstat",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getpwuid_r",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "chdir",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__stack_chk_fail",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "dup2",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strchr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_setspecific",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_mutex_destroy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "nanosleep",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strrchr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "uname",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "dup",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "lseek",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getsid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "gettimeofday",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__fxstatat64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "memset",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "ioctl",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strnlen",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getcwd",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetIPInfo",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "log",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "close",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "setsid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "closedir",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_attr_getstack",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "epoll_ctl",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sched_yield",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetLanguageSpecificData",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "memchr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "read",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__libc_start_main",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "memcmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_attr_init",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_rwlock_wrlock",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_rwlock_rdlock",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "utimes",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnattr_init",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "calloc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__fxstat64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strcmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "signal",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "dirfd",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__memcpy_chk",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "syscall",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sigemptyset",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "realpath",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "memcpy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "socketpair",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_setname_np",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "time",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getgid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetIP",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__xstat",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "readdir",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "mmap64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_getspecific",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_mutex_unlock",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pause",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "powf",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "malloc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strncasecmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "ttyname_r",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__fxstat",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "clock_gettime",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "bcmp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_rwlock_unlock",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnp",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__vsnprintf_chk",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_attr_setstacksize",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__strncpy_chk",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "realloc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "cfmakeraw",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "recvmsg",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getauxval",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pwrite",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnattr_setsigdefault",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_key_create",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "epoll_wait",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_GetDataRelBase",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "gnu_get_libc_version",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "poll",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "readv",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_SetGR",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "open64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "memmove",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "readdir64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "fsync",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_self",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "tcgetattr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "tcsetattr",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "access",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sysconf",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_join",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "rename",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getsockname",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_attr_destroy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getpgid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__lxstat64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pread",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "setpgid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "epoll_create",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pipe2",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_key_delete",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "link",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "getppid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawnattr_setflags",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "exit",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "lseek64",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_memalign",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sched_getaffinity",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_DeleteException",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "posix_spawn_file_actions_adddup2",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sigaltstack",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "strerror",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_Resume",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "waitid",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_rwlock_destroy",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_mutex_init",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "epoll_create1",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__cxa_finalize",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "sigaddset",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "pthread_mutex_lock",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__ctype_tolower_loc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "__ctype_b_loc",
+            "category": "other",
+            "score": 0.0
+        },
+        {
+            "name": "_Unwind_SetIP",
+            "category": "other",
+            "score": 0.0
+        }
+    ],
+    "byte_patterns": []
+}

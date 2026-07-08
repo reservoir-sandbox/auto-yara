@@ -1,0 +1,48 @@
+{
+    "ranked_strings": [
+        {
+            "value": "wget -O /tmp/dvrHelper http://",
+            "section": ".rodata",
+            "offset": "0x1238a",
+            "score": 5.0
+        },
+        {
+            "value": "<?xml version=\"1.0\" ?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Upgrade xmlns:u=\"urn:schemas-upnp-org:service:WANPPPConnection:1\"><NewStatusURL>",
+            "section": ".rodata",
+            "offset": "0x12408",
+            "score": 5.0
+        },
+        {
+            "value": "/etc/config/resolv.conf",
+            "section": ".rodata",
+            "offset": "0x14082",
+            "score": 2.0
+        },
+        {
+            "value": "/etc/services",
+            "section": ".rodata",
+            "offset": "0x1405a",
+            "score": 0.0
+        },
+        {
+            "value": "/etc/resolv.conf",
+            "section": ".rodata",
+            "offset": "0x14071",
+            "score": 0.0
+        },
+        {
+            "value": "/etc/hosts",
+            "section": ".rodata",
+            "offset": "0x1417c",
+            "score": 0.0
+        },
+        {
+            "value": "/etc/config/hosts",
+            "section": ".rodata",
+            "offset": "0x14187",
+            "score": 0.0
+        }
+    ],
+    "ranked_imports": [],
+    "byte_patterns": []
+}
