@@ -9,6 +9,7 @@ Automatic YARA rule generator for ELF malware binaries.
 - [main.py — Full Pipeline (MVP)](#mainpy--full-pipeline-mvp)
 - [feature_extractor.py](#feature_extractorpy)
 - [string_filter.py](#string_filterpy)
+- [ranker.py](#rankerpy)
 - [entropy.py](#entropypy)
 - [whitelist_builder.py](#whitelist_builderpy)
 - [suspicious_imports.py](#suspicious_importspy)
@@ -203,6 +204,88 @@ python string_filter.py --input corpus/malware/mirai.elf --output output/mirai_f
     ]
 }
 ```
+
+---
+## ranker.py
+
+Scores every extracted string and import with a numeric relevance
+score, without filtering or truncating anything. Ranker's job is to
+*annotate*, not *select* — the actual inclusion decision for a
+generated rule is deferred to `validator.py` (Week 7), which can test
+candidate feature sets empirically against the clean and malware
+corpora rather than relying on a fixed heuristic threshold.
+
+**Usage**
+
+```bash
+python ranker.py --input <path_to_elf> --output <path_to_json> [--whitelist <path>]
+```
+
+**Example**
+
+```bash
+python ranker.py --input corpus/malware/mirai.elf --output output/mirai_ranked.json
+```
+
+Also available as an optional flag on the main pipeline:
+
+```bash
+python main.py --input corpus/malware/mirai.elf --name Mirai --output output/mirai_auto.yar --rank-output output/mirai_ranked.json
+```
+
+**Scoring rules — strings**
+
+| Signal | Score |
+|---|---|
+| IP address or URL | `+3.0` |
+| Email address | `+3.0` |
+| Botnet command (`ATTACK`, `SCAN`, `KILL`) | `+2.5` |
+| Non-standard path (`/proc`, `/dev`, `/tmp`, `/var/run`, `/root`) or length > 20 | `+2.0` |
+| Found in clean-string whitelist | `-5.0` |
+
+**Scoring rules — imports**
+
+Each imported symbol is scored by its `feature_extractor` category
+weight (`antidebug` 2.0, `memory`/`process` 1.5, `network`/`privileges`
+1.0, `filesystem` 0.5, `other` 0.0). Any suspicious combination
+detected by `suspicious_imports.detect_suspicious_combinations()` (see
+[suspicious_imports.py](#suspicious_importspy)) is added as its own
+high-scoring entry (`+3.0`), separate from the individual imports
+involved.
+
+**Output format**
+
+```json
+{
+    "ranked_strings": [
+        { "value": "...", "section": ".rodata", "offset": "0x...", "score": 5.0 }
+    ],
+    "ranked_imports": [
+        { "name": "ptrace", "category": "antidebug", "score": 2.0 },
+        { "name": "antidebug+network", "category": "combo", "score": 3.0 }
+    ],
+    "byte_patterns": []
+}
+```
+
+> `byte_patterns` is reserved for Week 6 (`byte_pattern_extractor.py`)
+> and is always empty for now.
+
+**Known limitations**
+
+Scoring is a context-free heuristic — it has no way to distinguish an
+actual indicator (e.g. a real C2 IP) from incidental pattern matches
+inside unrelated data, or from legitimate code that happens to
+reference a URL or validate IP-like syntax. Testing against a clean
+binary (`corpus/clean/bat`) surfaced concrete false positives:
+IP-pattern matches inside concatenated version strings, botnet-command
+substring matches inside unrelated text blobs, and import scores with
+no clean-binary baseline. These are documented as known limitations
+rather than patched ad hoc, since fixing them without an empirical
+feedback loop (Week 7's `validator.py`) risks over-fitting to a single
+sample. `main.py` currently builds rules from `string_filter` output
+directly — `ranked_strings`/`ranked_imports` have no effect on
+generated rules yet.
 
 ---
 
