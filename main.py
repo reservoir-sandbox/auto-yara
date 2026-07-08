@@ -1,4 +1,5 @@
 from elf_parser import parse_header
+from feature_extractor import save_to_json
 from rule_builder import YaraRuleBuilder
 from string_filter import filter_strings
 from elftools.elf.elffile import ELFFile
@@ -101,6 +102,7 @@ if __name__ == "__main__":
     )
     from string_filter import load_whitelist
     from suspicious_imports import detect_suspicious_combinations
+    from ranker import rank_features
 
     parser = argparse.ArgumentParser(
         description="Generate a YARA rule from an ELF binary"
@@ -120,14 +122,24 @@ if __name__ == "__main__":
         action="store_true",
         help="Only extract and print features, skip rule generation",
     )
+    parser.add_argument(
+        "--rank-output",
+        required=False,
+        help="Path to save the ranked features report (JSON)",
+    )
     args = parser.parse_args()
 
     whitelist = load_whitelist(args.whitelist)
     raw_strings = extract_strings(args.input)
     filtered = filter_strings(raw_strings, whitelist)
+    imports = extract_imports(args.input)
+
+    if args.rank_output:
+        ranked = rank_features(filtered, imports, whitelist)
+        save_to_json(ranked, args.rank_output)
+        print(f"Ranked features saved to {args.rank_output}")
 
     if args.features_only:
-        imports = extract_imports(args.input)
         features = {
             "strings_filtered": filtered,
             "imports": imports,
