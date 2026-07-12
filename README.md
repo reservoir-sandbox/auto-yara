@@ -2,7 +2,7 @@
 
 Automatic YARA rule generator for ELF malware binaries.
 
-> 🚧 Work in progress — MVP complete (Week 4 of 7)
+> 🚧 Work in progress — Week 6 of 7 complete
 
 ## Contents
 
@@ -13,6 +13,7 @@ Automatic YARA rule generator for ELF malware binaries.
 - [entropy.py](#entropypy)
 - [whitelist_builder.py](#whitelist_builderpy)
 - [suspicious_imports.py](#suspicious_importspy)
+- [byte_pattern_extractor.py](#byte_pattern_extractorpy)
 - [rule_builder.py](#rule_builderpy)
 
 ---
@@ -21,9 +22,11 @@ Automatic YARA rule generator for ELF malware binaries.
 
 Generates a complete, syntax-validated YARA rule from a raw ELF binary
 in one command. Internally it extracts strings, filters them against
-known malware-relevant patterns and a clean-binary whitelist, and
-assembles a rule with a condition that adapts to how many indicators
-were found, plus a dynamically detected architecture check.
+known malware-relevant patterns and a clean-binary whitelist, extracts
+a small set of byte-level patterns (function prologues, direct
+syscalls — see [byte_pattern_extractor.py](#byte_pattern_extractorpy)),
+and assembles a rule with a condition that adapts to how many
+indicators were found, plus a dynamically detected architecture check.
 
 **Usage**
 
@@ -36,51 +39,67 @@ python main.py --input <path_to_elf> --name <rule_name> --output <path_to_yar>
 | Argument | Required | Description |
 |---|---|---|
 | `--input` | Yes | Path to the ELF binary to analyze |
-| `--name` | Yes, unless `--features-only` | Name to give the generated YARA rule (architecture is auto-appended, e.g. `Mirai` becomes `Mirai_EM_386`) |
+| `--name` | Yes, unless `--features-only` | Name to give the generated YARA rule (architecture is auto-appended, e.g. `Mirai` becomes `Mirai_EM_X86_64`) |
 | `--output` | Yes, unless `--features-only` | Path to save the generated `.yar` file |
 | `--whitelist` | No | Path to clean-string whitelist (default: `whitelist/clean_strings.txt`) |
 | `--features-only` | No | Skip rule generation; print all extracted features as JSON instead |
+| `--rank-output` | No | Path to save the ranked features report (JSON) |
+| `--full-byte-patterns` | No | With `--features-only`, print every extracted byte pattern instead of a 5-item preview |
 
 **Example**
 
 ```bash
-python main.py --input corpus/malware/mirai.elf --name Mirai --output output/mirai_auto.yar
+python main.py --input corpus/malware/Mirai_64.elf --name Mirai --output output/mirai_auto.yar
 ```
 
 ```yara
 import "elf"
-rule Mirai_EM_386
+rule Mirai_EM_X86_64
 {
     meta:
         author = "auto-yara"
         entropy = "normal"
 
     strings:
-        $s1 = "wget -O /tmp/dvrHelper http://"
-        $s2 = "/etc/services"
-        $s3 = "/etc/resolv.conf"
-        $s4 = "/etc/config/resolv.conf"
-        $s5 = "/etc/hosts"
-        $s6 = "/etc/config/hosts"
+        $s1 = "/proc/self/exe"
+        $s2 = "185.247.224.41"
+        $s3 = "/proc/%d"
+        ...
+        $bp1 = {B8 3B 00 00 00 0F 05}
+        $bp2 = {41 55 41 54 55 53 48 81 EC ?? ?? ?? ??}
+        $bp3 = {41 56 41 55 41 54 55 53 48 83 EC ??}
+        $bp4 = {41 56 41 55 41 54 55 53 48 83 EC ??}
+        $bp5 = {41 56 41 55 41 54 55 53 48 81 EC ?? ?? ?? ??}
 
     condition:
-        uint32(0) == 0x464C457F and elf.machine == elf.EM_386 and 2 of ($s*)
+        uint32(0) == 0x464C457F and elf.machine == elf.EM_X86_64 and 2 of ($s*) and 1 of ($bp*)
 }
 ```
 
 **Condition logic**
 
-| Strings found | Condition used |
+| Signal | Condition fragment |
 |---|---|
-| 0 | `magic and arch` only |
-| 1 | `magic and arch and 1 of ($s*)` |
-| 2+ | `magic and arch and 2 of ($s*)` |
+| Strings: 0 found | (nothing added) |
+| Strings: 1 found | `1 of ($s*)` |
+| Strings: 2+ found | `2 of ($s*)` |
+| Byte patterns: any found | `1 of ($bp*)` |
 
 Architecture is detected automatically from the binary's ELF header
 (`elf.machine == elf.EM_X86_64`, `elf.EM_386`, etc.) rather than
 hardcoded — this matters because a fixed architecture check would
 silently break detection on binaries compiled for a different
 architecture than expected.
+
+**Byte pattern selection**
+
+Up to 5 byte patterns are included per rule (`select_byte_patterns_for_rule()`
+in `main.py`), prioritizing direct-syscall patterns over function
+prologues — a syscall match like `direct_syscall_execve` is far more
+specific than a generic prologue like `48 83 EC ??`, which alone is
+common across most compiled binaries. All selected patterns are
+renamed to a shared `$bp` prefix so the condition can reference them
+as one group (`1 of ($bp*)`).
 
 Every generated rule is validated for syntax correctness via
 `yara-python` before being saved.
@@ -91,7 +110,7 @@ For debugging or inspection without generating a rule, run with
 `--features-only` to print every extracted feature as JSON:
 
 ```bash
-python main.py --input corpus/malware/mirai.elf --features-only
+python main.py --input corpus/malware/Mirai_64.elf --features-only
 ```
 
 ```json
@@ -102,11 +121,21 @@ python main.py --input corpus/malware/mirai.elf --features-only
         "filesystem": [], "privileges": [], "other": []
     },
     "metadata": {
-        "is_stripped": false, "has_upx": false, "has_rwx_segment": false,
+        "is_stripped": true, "has_upx": false, "has_rwx_segment": false,
         "has_exec_stack": false, "is_static": true
     },
     "rodata_entropy": "normal",
-    "suspicious_imports": []
+    "suspicious_imports": [],
+    "byte_patterns": {
+        "supported": true,
+        "architecture": "EM_X86_64",
+        "patterns": [
+            { "identifier": "p1", "hex_bytes": "41 55 41 54 55 53 48 81 EC ?? ?? ?? ??" },
+            { "identifier": "direct_syscall_execve_1", "hex_bytes": "B8 3B 00 00 00 0F 05" }
+        ],
+        "patterns_truncated": true,
+        "patterns_total": 538
+    }
 }
 ```
 
@@ -114,20 +143,17 @@ python main.py --input corpus/malware/mirai.elf --features-only
 > show empty `imports` and `suspicious_imports` — this is expected,
 > not a bug. See [suspicious_imports.py](#suspicious_importspy) for why.
 
+> By default, `byte_patterns.patterns` is truncated to 5 entries with
+> `patterns_truncated: true` and `patterns_total` showing the real
+> count. Pass `--full-byte-patterns` to print every extracted pattern.
+
 **Known limitations (MVP scope)**
 
-- **Hex byte patterns**: `YaraRuleBuilder.add_hex_pattern()` exists
-  and is tested, but `main.py` doesn't generate hex patterns
-  automatically. A simple "first N bytes of the file" approach was
-  considered and rejected — it just duplicates the existing ELF
-  magic check without adding signal. Meaningful hex patterns would
-  require disassembly-level analysis of unique malware code/data,
-  which is out of scope for this MVP.
 - **Batch mode**: only a single binary can be analyzed per run.
   Generating one rule from multiple samples of the same malware
   family (to capture variant-resistant indicators) was deferred —
-  with only one real malware sample available for testing, this
-  logic couldn't be meaningfully validated.
+  with only a handful of real malware samples available for testing,
+  this logic couldn't be meaningfully validated.
 
 ---
 
@@ -268,8 +294,11 @@ involved.
 }
 ```
 
-> `byte_patterns` is reserved for Week 6 (`byte_pattern_extractor.py`)
-> and is always empty for now.
+> `byte_patterns` here is a placeholder field, always empty — ranker
+> does not yet score the byte patterns produced by
+> `byte_pattern_extractor.py`. Scoring these (e.g. weighting
+> `direct_syscall_*` patterns above generic prologues) is deferred to
+> a future iteration.
 
 **Known limitations**
 
@@ -364,6 +393,109 @@ python suspicious_imports.py
 > have no `.dynsym` entries for these calls, since they're compiled
 > directly into the binary. Check
 > `extract_metadata()['is_static']` before relying on this result.
+> See [byte_pattern_extractor.py](#byte_pattern_extractorpy) for the
+> static-binary equivalent of this check.
+
+---
+
+## byte_pattern_extractor.py
+
+Disassembles a binary's `.text` section (via Capstone) to extract
+byte-level patterns: function prologues and direct syscall invocations
+associated with suspicious behavior. Unlike string- or import-based
+detection, these patterns target the actual executed code, which is
+harder for malware authors to remove or obfuscate than plaintext
+strings or dynamic-symbol imports.
+
+**Usage**
+
+```python
+from byte_pattern_extractor import extract_byte_patterns
+
+result = extract_byte_patterns("corpus/malware/Mirai_64.elf")
+```
+
+**Output format**
+
+```json
+{
+    "supported": true,
+    "architecture": "EM_X86_64",
+    "patterns": [
+        { "identifier": "p1", "hex_bytes": "41 55 41 54 55 53 48 81 EC ?? ?? ?? ??" },
+        { "identifier": "direct_syscall_execve_1", "hex_bytes": "B8 3B 00 00 00 0F 05" }
+    ]
+}
+```
+
+**Scope**
+
+- **Architecture**: x86_64 only. Any other architecture (e.g. `EM_ARM`,
+  `EM_MIPS`) returns `{"supported": false, "architecture": ..., "patterns": []}`
+  rather than raising, so the rest of the pipeline can continue.
+  Multi-architecture support (MIPS/ARM) is not a design goal for this
+  project — the 32-bit x86 Mirai sample encountered during development
+  was incidental, not a deliberate target.
+- **Function prologues** (`find_function_prologues`): heuristically
+  matches 0–6 consecutive `push` instructions followed by
+  `sub rsp, N`. This replaces the classic `push rbp; mov rbp, rsp`
+  frame-pointer prologue, which failed to match on a real Rust/LLVM
+  -compiled test binary — modern compilers frequently omit the frame
+  pointer (`-fomit-frame-pointer`).
+- **Direct syscalls** (`find_suspicious_sequences`): looks for
+  `mov eax/rax, N` followed (within 10 instructions) by a `syscall`,
+  for a fixed set of syscall numbers associated with suspicious
+  capability — the same categories `suspicious_imports.py` flags via
+  `.dynsym`, but reachable here even when `.dynsym` is empty:
+
+  | Syscall | Number |
+  |---|---|
+  | `execve` | `0x3b` (59) |
+  | `ptrace` | `0x65` (101) |
+  | `clone` | `0x38` (56) |
+  | `memfd_create` | `0x13f` (319) |
+  | `init_module` | `0xaf` (175) |
+  | `finit_module` | `0x139` (313) |
+
+- **Wildcards** (`apply_wildcards`): converts a matched instruction
+  range into a YARA hex pattern, replacing build-specific immediate
+  values with `??` while keeping opcode bytes and (for syscall
+  patterns) the syscall number itself fixed. Uses Capstone's
+  `insn.imm_offset`/`insn.imm_size` to locate the immediate's exact
+  bytes within the instruction — `operand.size` was tried first but
+  reflects operation width (e.g. 8 for a 64-bit register), not the
+  immediate's actual encoded byte length, and produced wrong wildcard
+  ranges.
+
+**Known limitations**
+
+- **Direct syscall detection is only meaningful for static binaries.**
+  Dynamically linked binaries route these operations through libc
+  calls instead (which `suspicious_imports.py` catches via `.dynsym`),
+  so direct syscall instructions specific to our list are rare or
+  absent there — confirmed empirically on `RedXOR.elf` and
+  `Wirenet.elf` (both dynamically linked, 0 matches). Check
+  `extract_metadata()['is_static']` before relying on this result.
+- Several malware samples (`Wraith.elf`, `Prometei.elf` — different
+  files/hashes, same corrupted `e_shoff` value pointing past EOF) use
+  deliberately corrupted ELF section headers as an anti-analysis
+  technique; `pyelftools`' section-based APIs cannot process these
+  files, including `parse_segments()` which internally needs a section
+  for the dynamic string table. Not a bug in this codebase.
+- Uses linear disassembly (sequential decoding from `.text` start), not
+  control-flow-aware disassembly. Embedded non-code data in `.text`
+  could be misread as instructions past that point.
+- Prologue matching may flag `sub rsp, N` instructions that aren't
+  actually at a function's start (e.g. mid-function stack
+  adjustments), since there's no verification against symbol
+  boundaries.
+- XOR-decryption-loop detection (originally planned for this module)
+  was dropped from scope: no available sample qualified after
+  checking `Mirai_64.elf` (C2 strings are plaintext), `RedXOR.elf`
+  (dynamically linked, normal entropy, plaintext strings — no visible
+  XOR logic despite the name), and `Wirenet.elf` (has genuinely
+  encrypted-looking strings in `.data`, but is dynamically linked,
+  deprioritized in favor of the static-binary syscall detector).
 
 ---
 
@@ -390,7 +522,7 @@ print("Valid:", builder.validate())
 |---|---|
 | `set_meta(key, value)` | Adds a metadata field |
 | `add_string(id, value, modifiers="")` | Adds a string pattern (auto-escaped, auto-prefixed with `$`) |
-| `add_hex_pattern(id, hex_bytes)` | Adds a raw hex byte pattern |
+| `add_hex_pattern(id, hex_bytes)` | Adds a raw hex byte pattern (auto-prefixed with `$`) |
 | `set_condition(text)` | Sets the rule's condition |
 | `build()` | Returns the complete rule as text |
 | `validate()` | Compiles the rule via `yara-python`; returns `True`/`False` |

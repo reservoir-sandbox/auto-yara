@@ -1,2 +1,3 @@
 pyelftools>=0.33
 yara-python>=4.5.4
+capstone>=5.0.9

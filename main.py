@@ -6,6 +6,44 @@ from elftools.elf.elffile import ELFFile
 from entropy import classify_entropy
 
 _ELF_MAGIC_CHECK = "uint32(0) == 0x464C457F"
+_BYTE_PATTERNS_PREVIEW_LIMIT = 5
+_MAX_BYTE_PATTERNS_IN_RULE = 5
+
+
+def select_byte_patterns_for_rule(
+    patterns: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    """Selects a bounded, prioritized subset of byte patterns for a rule,
+    renaming identifiers to a single "bp" prefix so they can be
+    referenced as one group in a YARA condition (e.g. "1 of ($bp*)").
+
+    Prioritizes syscall-based patterns over prologue patterns, since
+    syscall matches are more specific and less prone to false positives
+    — a prologue like "48 83 EC ??" alone is common across most
+    compiled binaries.
+
+    Args:
+        patterns: Full list of patterns from extract_byte_patterns(),
+            each with the original "identifier" (e.g. "p12",
+            "direct_syscall_execve_1") and "hex_bytes".
+
+    Returns:
+        At most _MAX_BYTE_PATTERNS_IN_RULE patterns, syscall patterns
+        first, each with a fresh "bp{n}" identifier and its original
+        "hex_bytes" unchanged.
+    """
+    syscall_patterns = [
+        p for p in patterns if p["identifier"].startswith("direct_syscall_")
+    ]
+    other_patterns = [
+        p for p in patterns if not p["identifier"].startswith("direct_syscall_")
+    ]
+    selected = (syscall_patterns + other_patterns)[:_MAX_BYTE_PATTERNS_IN_RULE]
+
+    return [
+        {"identifier": f"bp{index}", "hex_bytes": pattern["hex_bytes"]}
+        for index, pattern in enumerate(selected, start=1)
+    ]
 
 
 def build_string_condition(num_strings: int) -> str:
@@ -76,17 +114,23 @@ def build_rule_from_features(
     for index, string in enumerate(filtered_strings, start=1):
         builder.add_string(f"s{index}", string["value"])
 
+    byte_patterns_result = extract_byte_patterns(elf_path)
+    selected_patterns = select_byte_patterns_for_rule(
+        byte_patterns_result["patterns"]
+    )
+    for pattern in selected_patterns:
+        builder.add_hex_pattern(pattern["identifier"], pattern["hex_bytes"])
+
     string_condition = build_string_condition(len(filtered_strings))
     arch_condition = build_arch_condition(architecture)
 
+    conditions = [_ELF_MAGIC_CHECK, arch_condition]
     if string_condition:
-        full_condition = (
-            f"{_ELF_MAGIC_CHECK} and {arch_condition} and {string_condition}"
-        )
-    else:
-        full_condition = f"{_ELF_MAGIC_CHECK} and {arch_condition}"
+        conditions.append(string_condition)
+    if selected_patterns:
+        conditions.append("1 of ($bp*)")
 
-    builder.set_condition(full_condition)
+    builder.set_condition(" and ".join(conditions))
     builder.add_import("elf")
 
     return builder
@@ -103,6 +147,7 @@ if __name__ == "__main__":
     from string_filter import load_whitelist
     from suspicious_imports import detect_suspicious_combinations
     from ranker import rank_features
+    from byte_pattern_extractor import extract_byte_patterns
 
     parser = argparse.ArgumentParser(
         description="Generate a YARA rule from an ELF binary"
@@ -127,6 +172,11 @@ if __name__ == "__main__":
         required=False,
         help="Path to save the ranked features report (JSON)",
     )
+    parser.add_argument(
+        "--full-byte-patterns",
+        action="store_true",
+        help="Show all extracted byte patterns instead of a truncated preview",
+    )
     args = parser.parse_args()
 
     whitelist = load_whitelist(args.whitelist)
@@ -140,12 +190,29 @@ if __name__ == "__main__":
         print(f"Ranked features saved to {args.rank_output}")
 
     if args.features_only:
+        imports = extract_imports(args.input)
+        byte_patterns = extract_byte_patterns(args.input)
+
+        if (
+            not args.full_byte_patterns
+            and len(byte_patterns["patterns"]) > _BYTE_PATTERNS_PREVIEW_LIMIT
+        ):
+            byte_patterns = {
+                **byte_patterns,
+                "patterns": byte_patterns["patterns"][
+                    :_BYTE_PATTERNS_PREVIEW_LIMIT
+                ],
+                "patterns_truncated": True,
+                "patterns_total": len(byte_patterns["patterns"]),
+            }
+
         features = {
             "strings_filtered": filtered,
             "imports": imports,
             "metadata": extract_metadata(args.input),
             "rodata_entropy": get_rodata_entropy_label(args.input),
             "suspicious_imports": detect_suspicious_combinations(imports),
+            "byte_patterns": byte_patterns,
         }
         print(json.dumps(features, indent=4))
     else:

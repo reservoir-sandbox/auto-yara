@@ -9,3 +9,7 @@ line_length = 80
 [tool.mypy]
 python_version = "3.11"
 strict = true
+
+[[tool.mypy.overrides]]
+module = "capstone.*"
+ignore_missing_imports = true
