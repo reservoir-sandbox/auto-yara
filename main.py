@@ -1,3 +1,4 @@
+from byte_pattern_extractor import extract_byte_patterns
 from elf_parser import parse_header
 from feature_extractor import save_to_json
 from rule_builder import YaraRuleBuilder
