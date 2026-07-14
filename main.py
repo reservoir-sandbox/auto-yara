@@ -148,6 +148,7 @@ if __name__ == "__main__":
     from suspicious_imports import detect_suspicious_combinations
     from ranker import rank_features
     from byte_pattern_extractor import extract_byte_patterns
+    from validator import improve_rule
 
     parser = argparse.ArgumentParser(
         description="Generate a YARA rule from an ELF binary"
@@ -176,6 +177,11 @@ if __name__ == "__main__":
         "--full-byte-patterns",
         action="store_true",
         help="Show all extracted byte patterns instead of a truncated preview",
+    )
+    parser.add_argument(
+        "--auto-improve",
+        action="store_true",
+        help="Run auto-improvement loop before saving the rule",
     )
     args = parser.parse_args()
 
@@ -222,11 +228,16 @@ if __name__ == "__main__":
             )
 
         builder = build_rule_from_features(args.input, args.name, filtered)
-        rule_text = builder.build()
+        if args.auto_improve:
+            final_builder = improve_rule(builder, [args.input], None)
+            rule_text = final_builder.build()
+        else:
+            final_builder = builder
+            rule_text = final_builder.build()
 
         with open(args.output, "w") as f:
             f.write(rule_text)
         print(rule_text)
         print()
-        print("Valid:", builder.validate())
+        print("Valid:", final_builder.validate())
         print(f"Rule saved to {args.output}")
