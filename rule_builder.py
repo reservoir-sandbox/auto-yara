@@ -1,4 +1,4 @@
-import yara  # type: ignore
+import yara
 
 
 class YaraRuleBuilder:
@@ -95,6 +95,27 @@ class YaraRuleBuilder:
         lines.append("}")
 
         return "\n".join(lines)
+
+    def remove_feature(self, identifier: str) -> bool:
+        """Removes a string or hex pattern by identifier.
+
+        Args:
+            identifier: The identifier to remove (without leading "$").
+
+        Returns:
+            True if a feature was removed, False if no match was found.
+        """
+        original_string_count = len(self.strings)
+        original_hex_count = len(self.hex_patterns)
+
+        self.strings = [s for s in self.strings if s[0] != identifier]
+        self.hex_patterns = [h for h in self.hex_patterns if h[0] != identifier]
+
+        if len(self.strings) < original_string_count:
+            return True
+        if len(self.hex_patterns) < original_hex_count:
+            return True
+        return False
 
     def validate(self) -> bool:
         """Validates the YARA rule for basic correctness.
