@@ -2,7 +2,6 @@
 
 Automatic YARA rule generator for ELF malware binaries.
 
-> 🚧 Work in progress — Week 6 of 7 complete
 
 ## Contents
 
@@ -15,6 +14,7 @@ Automatic YARA rule generator for ELF malware binaries.
 - [suspicious_imports.py](#suspicious_importspy)
 - [byte_pattern_extractor.py](#byte_pattern_extractorpy)
 - [rule_builder.py](#rule_builderpy)
+- [validator.py](#validatorpy)
 
 ---
 
@@ -27,6 +27,9 @@ a small set of byte-level patterns (function prologues, direct
 syscalls — see [byte_pattern_extractor.py](#byte_pattern_extractorpy)),
 and assembles a rule with a condition that adapts to how many
 indicators were found, plus a dynamically detected architecture check.
+Optionally, the assembled rule can be run through an empirical
+auto-improvement loop before being saved (see
+[validator.py](#validatorpy)).
 
 **Usage**
 
@@ -45,11 +48,12 @@ python main.py --input <path_to_elf> --name <rule_name> --output <path_to_yar>
 | `--features-only` | No | Skip rule generation; print all extracted features as JSON instead |
 | `--rank-output` | No | Path to save the ranked features report (JSON) |
 | `--full-byte-patterns` | No | With `--features-only`, print every extracted byte pattern instead of a 5-item preview |
+| `--auto-improve` | No | Run the empirical auto-improvement loop (`validator.improve_rule`) on the generated rule before saving |
 
 **Example**
 
 ```bash
-python main.py --input corpus/malware/Mirai_64.elf --name Mirai --output output/mirai_auto.yar
+python main.py --input corpus/malware/Mirai_64.elf --name Mirai --output output/mirai_auto.yar --auto-improve
 ```
 
 ```yara
@@ -61,13 +65,15 @@ rule Mirai_EM_X86_64
         entropy = "normal"
 
     strings:
-        $s1 = "/proc/self/exe"
         $s2 = "185.247.224.41"
         $s3 = "/proc/%d"
-        ...
-        $bp1 = {B8 3B 00 00 00 0F 05}
-        $bp2 = {41 55 41 54 55 53 48 81 EC ?? ?? ?? ??}
-        $bp3 = {41 56 41 55 41 54 55 53 48 83 EC ??}
+        $s4 = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        $s5 = "/bin/systemd-daemon"
+        $s6 = "/etc/init/systemd-agent.conf"
+        $s7 = "/dev/urandom"
+        $s8 = "87.98.162.88"
+        $s9 = "82.221.103.244"
+        $s10 = "67.215.246.10"
         $bp4 = {41 56 41 55 41 54 55 53 48 83 EC ??}
         $bp5 = {41 56 41 55 41 54 55 53 48 81 EC ?? ?? ?? ??}
 
@@ -75,6 +81,10 @@ rule Mirai_EM_X86_64
         uint32(0) == 0x464C457F and elf.machine == elf.EM_X86_64 and 2 of ($s*) and 1 of ($bp*)
 }
 ```
+
+Note the gap at `$s1` — that identifier was removed by `--auto-improve`
+because it caused a false positive against the clean corpus. See
+[validator.py](#validatorpy) for how this decision gets made.
 
 **Condition logic**
 
@@ -524,5 +534,141 @@ print("Valid:", builder.validate())
 | `add_string(id, value, modifiers="")` | Adds a string pattern (auto-escaped, auto-prefixed with `$`) |
 | `add_hex_pattern(id, hex_bytes)` | Adds a raw hex byte pattern (auto-prefixed with `$`) |
 | `set_condition(text)` | Sets the rule's condition |
+| `remove_feature(identifier)` | Removes a string or hex pattern by identifier (no leading `$`); returns `True` if something was removed |
 | `build()` | Returns the complete rule as text |
 | `validate()` | Compiles the rule via `yara-python`; returns `True`/`False` |
+
+---
+
+## validator.py
+
+Measures a generated rule's real-world quality by compiling it and
+running it against actual files, instead of trusting the heuristics
+that built it. Where `ranker.py` scores features in the abstract
+(*"IP addresses are usually suspicious"*), `validator.py` checks the
+concrete fact (*"does this exact rule actually fire on this exact
+file?"*) — and, when it doesn't like the answer, can rewrite the rule
+itself.
+
+**Usage**
+
+```python
+from rule_builder import YaraRuleBuilder
+from validator import get_quality_report, improve_rule
+
+builder = YaraRuleBuilder("Mirai_EM_X86_64")
+# ... populate builder via add_string / add_hex_pattern / set_condition ...
+
+report = get_quality_report(
+    builder.build(),
+    malware_paths=["corpus/malware/Mirai_64.elf"],
+)
+print(report["verdict"])  # "Good" / "Needs review" / "Unusable"
+
+improved_builder = improve_rule(builder, ["corpus/malware/Mirai_64.elf"])
+```
+
+Also available on the main pipeline via `--auto-improve` (see
+[main.py](#mainpy--full-pipeline-mvp)).
+
+**Functions**
+
+| Function | Description |
+|---|---|
+| `check_false_positives(rule_source, clean_paths=None)` | Compiles the rule and matches it against every file in `clean_paths` (a list of files/dirs, or the full `corpus/clean/` by default). Returns matched clean files with details on which `$s*`/`$bp*` identifiers fired. |
+| `check_true_positives(rule_source, malware_paths)` | Matches the rule against an explicit list of malware files. Returns `{"matches": [...], "misses": [...]}` — files the rule caught vs. missed. |
+| `get_quality_report(rule_source, malware_paths, clean_paths=None)` | Runs both checks and summarizes: `false_positive_count`, `true_positive_rate`, and a `verdict`. |
+| `improve_rule(builder, malware_paths, clean_paths=None)` | Auto-improvement loop (see below). Mutates and returns the same `YaraRuleBuilder`. |
+
+**Why `malware_paths` is explicit, not a directory scan**
+
+Unlike the clean corpus (a fixed asset shipped with the tool, used to
+validate *any* rule), the malware corpus in `corpus/malware/` holds
+several unrelated families (Mirai, Chapros, RedXOR, Wirenet). A rule
+generated from one file isn't expected to match a different family, so
+scanning the whole directory would produce meaningless "misses" for
+files the rule was never meant to catch. Callers pass the specific
+file(s) that *should* match — in the CLI (`--auto-improve`), that's
+just the file the rule was generated from
+(`malware_paths=[args.input]`), since there is no user-supplied
+malware corpus in the real deployment scenario (a user uploads one
+file; the clean corpus is the tool's own asset, not something the user
+provides).
+
+**Quality verdicts**
+
+| Condition | Verdict |
+|---|---|
+| `fp_count == 0` and `tp_rate == 1.0` | `Good` |
+| `fp_count == 0` and `tp_rate < 1.0` | `Needs review` |
+| `fp_count > 0` | `Unusable` |
+
+**Auto-improvement loop (`improve_rule`)**
+
+On each iteration:
+
+1. Compile the current rule and check false positives.
+2. If none — done.
+3. Otherwise, extract the offending identifiers
+   (`_extract_culprit_identifiers`, via YARA's `match.strings[i].identifier`,
+   stripped of its leading `$`) minus any already rejected this run.
+4. If candidates remain: remove one (`builder.remove_feature`), then
+   immediately re-check true positives. If the removal dropped the
+   rule's ability to catch its own malware sample, roll the removal
+   back (restore from a `list.copy()` snapshot) and mark that
+   identifier as rejected, so the same culprit isn't retried forever.
+   Otherwise, keep the change and continue.
+5. If no candidates remain (all have been tried and rejected):
+   fall back to raising the `N of ($s*)` threshold in the condition by
+   one (`_bump_string_threshold`, a regex-based rewrite of the
+   condition text, capped at the number of available strings). If the
+   threshold could be raised, loop again; if it was already at the
+   maximum, stop — nothing left to try.
+
+The loop always terminates: removal candidates strictly shrink
+(rejected identifiers are never retried) and the threshold has a hard
+ceiling, so there's no path to infinite looping.
+
+**A rule that can't be fixed without trade-offs is reported honestly**
+
+If the only string that produces a false positive is also the *only*
+string that matches the malware sample, removing it drops true
+positives to zero — `improve_rule` correctly refuses that trade,
+rejects the culprit, and falls back to raising the match threshold.
+If that still can't separate the malware sample from the clean corpus
+(because there's no remaining distinguishing feature at all), the loop
+exits with `false_positive_count == 0` but `true_positive_rate == 0.0`
+— a `"Needs review"` verdict, not a silently "fixed" rule. This was
+verified directly: a rule built from a single string that occurs in
+both the malware sample and the clean corpus (`/dev/null`) alongside
+two non-matching decoy strings ends up with an unsatisfiable
+`2 of ($s*)` condition, honestly reported as `Needs review` rather
+than `Good`.
+
+**Verified on real corpus**
+
+Run against a real Mirai_64.elf-derived rule with three strings
+(`/proc/self/exe`, `rsa_encrypt`, `/dev/null`) against the real clean
+corpus: `BEFORE: 2 fp, 1.0 tp, Unusable` →
+`AFTER: 0 fp, 1.0 tp, Good`, with `/proc/self/exe` and `/dev/null`
+removed as culprits (both independently confirmed present in
+`corpus/clean/busybox_x86_64`) and `rsa_encrypt` — a real,
+distinguishing indicator — retained.
+
+**Known limitations**
+
+- `yara.StringMatch`/`yara.StringMatchInstance` structure was
+  confirmed empirically against the installed `yara-python` version
+  (`.identifier`, `.instances`, `.is_xor` on the former;
+  `.matched_data`, `.matched_length`, `.offset`, `.plaintext`,
+  `.xor_key` on the latter) rather than assumed, since this API has
+  changed across `yara-python` versions.
+- `improve_rule` removes one culprit per iteration and re-validates
+  both directions (FP and TP) each time, rather than removing all
+  flagged identifiers at once — slower, but avoids over-removing
+  features whose combined loss would hurt TP even if no single one
+  does.
+- The threshold-bump fallback only tightens `N of ($s*)`; it has no
+  equivalent adjustment for `$bp*` (byte pattern) conditions, and does
+  not attempt to combine string and byte-pattern conditions in new
+  ways.
