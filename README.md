@@ -2,6 +2,7 @@
 
 Automatic YARA rule generator for ELF malware binaries.
 
+> ✅ Feature-complete — all 7 weeks done
 
 ## Contents
 
@@ -23,13 +24,16 @@ Automatic YARA rule generator for ELF malware binaries.
 Generates a complete, syntax-validated YARA rule from a raw ELF binary
 in one command. Internally it extracts strings, filters them against
 known malware-relevant patterns and a clean-binary whitelist, extracts
-a small set of byte-level patterns (function prologues, direct
-syscalls — see [byte_pattern_extractor.py](#byte_pattern_extractorpy)),
-and assembles a rule with a condition that adapts to how many
-indicators were found, plus a dynamically detected architecture check.
-Optionally, the assembled rule can be run through an empirical
-auto-improvement loop before being saved (see
-[validator.py](#validatorpy)).
+a small set of deduplicated byte-level patterns (function prologues,
+direct syscalls — see
+[byte_pattern_extractor.py](#byte_pattern_extractorpy)), and assembles
+a rule with a condition that adapts to how many indicators were found,
+plus a dynamically detected architecture check. By default, the
+assembled rule is then run through an empirical auto-improvement loop
+before being saved (see [validator.py](#validatorpy)) — this reflects
+the tool's real deployment scenario (a user uploads one file and
+downloads one `.yar` file), where there's no separate "review" step
+for a human to apply improvements manually.
 
 **Usage**
 
@@ -48,12 +52,12 @@ python main.py --input <path_to_elf> --name <rule_name> --output <path_to_yar>
 | `--features-only` | No | Skip rule generation; print all extracted features as JSON instead |
 | `--rank-output` | No | Path to save the ranked features report (JSON) |
 | `--full-byte-patterns` | No | With `--features-only`, print every extracted byte pattern instead of a 5-item preview |
-| `--auto-improve` | No | Run the empirical auto-improvement loop (`validator.improve_rule`) on the generated rule before saving |
+| `--no-auto-improve` | No | Skip the empirical auto-improvement loop (`validator.improve_rule`), which otherwise runs by default before saving |
 
 **Example**
 
 ```bash
-python main.py --input corpus/malware/Mirai_64.elf --name Mirai --output output/mirai_auto.yar --auto-improve
+python main.py --input corpus/malware/Mirai_64.elf --name Mirai --output output/mirai_auto.yar
 ```
 
 ```yara
@@ -74,17 +78,21 @@ rule Mirai_EM_X86_64
         $s8 = "87.98.162.88"
         $s9 = "82.221.103.244"
         $s10 = "67.215.246.10"
-        $bp4 = {41 56 41 55 41 54 55 53 48 83 EC ??}
-        $bp5 = {41 56 41 55 41 54 55 53 48 81 EC ?? ?? ?? ??}
 
     condition:
-        uint32(0) == 0x464C457F and elf.machine == elf.EM_X86_64 and 2 of ($s*) and 1 of ($bp*)
+        uint32(0) == 0x464C457F and elf.machine == elf.EM_X86_64 and 2 of ($s*)
 }
 ```
 
-Note the gap at `$s1` — that identifier was removed by `--auto-improve`
-because it caused a false positive against the clean corpus. See
-[validator.py](#validatorpy) for how this decision gets made.
+Note the gap at `$s1` — that identifier was removed by the
+auto-improvement loop because it caused a false positive against the
+clean corpus. Note also that this particular run left no `$bp*` byte
+patterns at all: every extracted prologue pattern for this sample
+turned out to also match the clean corpus, so all of them were
+removed and `1 of ($bp*)` was stripped from the condition entirely
+(see [validator.py](#validatorpy) for both mechanisms). Pass
+`--no-auto-improve` to see the full, unfiltered rule this sample would
+otherwise produce.
 
 **Condition logic**
 
@@ -103,13 +111,23 @@ architecture than expected.
 
 **Byte pattern selection**
 
-Up to 5 byte patterns are included per rule (`select_byte_patterns_for_rule()`
-in `main.py`), prioritizing direct-syscall patterns over function
-prologues — a syscall match like `direct_syscall_execve` is far more
-specific than a generic prologue like `48 83 EC ??`, which alone is
-common across most compiled binaries. All selected patterns are
-renamed to a shared `$bp` prefix so the condition can reference them
-as one group (`1 of ($bp*)`).
+Up to 5 byte patterns are included per rule
+(`select_byte_patterns_for_rule()` in `main.py`), prioritizing
+direct-syscall patterns over function prologues — a syscall match like
+`direct_syscall_execve` is far more specific than a generic prologue
+like `48 83 EC ??`, which alone is common across most compiled
+binaries. Before that priority ordering is applied, patterns are
+deduplicated by their exact `hex_bytes` value
+(`_deduplicate_by_hex_bytes()`): several distinct prologues at
+different addresses can wildcard down to the *same* byte pattern (e.g.
+several `sub rsp, N` prologues all becoming `48 83 EC ??` once the
+stack-size immediate is wildcarded), and without deduplication the
+5-pattern budget could be spent on multiple copies of one pattern
+instead of several genuinely different ones — this was caught by
+testing against `Chapros.elf`, where all 5 selected patterns
+originally came out identical. All selected patterns are renamed to a
+shared `$bp` prefix so the condition can reference them as one group
+(`1 of ($bp*)`).
 
 Every generated rule is validated for syntax correctness via
 `yara-python` before being saved.
@@ -156,6 +174,9 @@ python main.py --input corpus/malware/Mirai_64.elf --features-only
 > By default, `byte_patterns.patterns` is truncated to 5 entries with
 > `patterns_truncated: true` and `patterns_total` showing the real
 > count. Pass `--full-byte-patterns` to print every extracted pattern.
+> This raw feature list is shown pre-deduplication — deduplication
+> only happens inside `select_byte_patterns_for_rule()` when a rule is
+> actually being assembled.
 
 **Known limitations (MVP scope)**
 
@@ -445,7 +466,10 @@ result = extract_byte_patterns("corpus/malware/Mirai_64.elf")
   rather than raising, so the rest of the pipeline can continue.
   Multi-architecture support (MIPS/ARM) is not a design goal for this
   project — the 32-bit x86 Mirai sample encountered during development
-  was incidental, not a deliberate target.
+  was incidental, not a deliberate target. (`Wirenet.elf` in the test
+  corpus is also 32-bit `EM_386`, confirmed via `parse_header()` —
+  byte-pattern extraction correctly returns `supported: false` for it,
+  producing a strings-only rule.)
 - **Function prologues** (`find_function_prologues`): heuristically
   matches 0–6 consecutive `push` instructions followed by
   `sub rsp, N`. This replaces the classic `push rbp; mov rbp, rsp`
@@ -568,7 +592,8 @@ print(report["verdict"])  # "Good" / "Needs review" / "Unusable"
 improved_builder = improve_rule(builder, ["corpus/malware/Mirai_64.elf"])
 ```
 
-Also available on the main pipeline via `--auto-improve` (see
+`improve_rule` runs by default on the main pipeline; pass
+`--no-auto-improve` to skip it (see
 [main.py](#mainpy--full-pipeline-mvp)).
 
 **Functions**
@@ -588,12 +613,11 @@ several unrelated families (Mirai, Chapros, RedXOR, Wirenet). A rule
 generated from one file isn't expected to match a different family, so
 scanning the whole directory would produce meaningless "misses" for
 files the rule was never meant to catch. Callers pass the specific
-file(s) that *should* match — in the CLI (`--auto-improve`), that's
-just the file the rule was generated from
-(`malware_paths=[args.input]`), since there is no user-supplied
-malware corpus in the real deployment scenario (a user uploads one
-file; the clean corpus is the tool's own asset, not something the user
-provides).
+file(s) that *should* match — in the CLI, that's just the file the
+rule was generated from (`malware_paths=[args.input]`), since there is
+no user-supplied malware corpus in the real deployment scenario (a
+user uploads one file; the clean corpus is the tool's own asset, not
+something the user provides).
 
 **Quality verdicts**
 
@@ -611,13 +635,25 @@ On each iteration:
 2. If none — done.
 3. Otherwise, extract the offending identifiers
    (`_extract_culprit_identifiers`, via YARA's `match.strings[i].identifier`,
-   stripped of its leading `$`) minus any already rejected this run.
+   stripped of its leading `$`) minus any already rejected this run,
+   and pick one deterministically (`sorted(culprits)[0]`) — `set`
+   iteration order in Python isn't guaranteed to be stable across
+   runs, and picking arbitrarily via `next(iter(...))` produced
+   different rules from the same input on different runs during
+   testing.
 4. If candidates remain: remove one (`builder.remove_feature`), then
-   immediately re-check true positives. If the removal dropped the
-   rule's ability to catch its own malware sample, roll the removal
-   back (restore from a `list.copy()` snapshot) and mark that
-   identifier as rejected, so the same culprit isn't retried forever.
-   Otherwise, keep the change and continue.
+   strip any now-empty `N of ($s*)` / `1 of ($bp*)` fragment from the
+   condition entirely (`_strip_empty_condition_fragments`) — removing
+   the last remaining string or byte pattern leaves a condition
+   referencing zero members of that group, which YARA refuses to
+   compile rather than treating as "never matches"; this was caught
+   when a real run emptied the `$bp*` group across several iterations
+   and crashed on the next false-positive check. Then immediately
+   re-check true positives. If the removal dropped the rule's ability
+   to catch its own malware sample, roll the removal back (restore
+   from a `list.copy()` snapshot) and mark that identifier as
+   rejected, so the same culprit isn't retried forever. Otherwise,
+   keep the change and continue.
 5. If no candidates remain (all have been tried and rejected):
    fall back to raising the `N of ($s*)` threshold in the condition by
    one (`_bump_string_threshold`, a regex-based rewrite of the
@@ -647,13 +683,15 @@ than `Good`.
 
 **Verified on real corpus**
 
-Run against a real Mirai_64.elf-derived rule with three strings
-(`/proc/self/exe`, `rsa_encrypt`, `/dev/null`) against the real clean
-corpus: `BEFORE: 2 fp, 1.0 tp, Unusable` →
-`AFTER: 0 fp, 1.0 tp, Good`, with `/proc/self/exe` and `/dev/null`
-removed as culprits (both independently confirmed present in
-`corpus/clean/busybox_x86_64`) and `rsa_encrypt` — a real,
-distinguishing indicator — retained.
+Run repeatedly against a real `Mirai_64.elf`-derived rule against the
+real clean corpus: `BEFORE: 2 fp, 1.0 tp, Unusable` →
+`AFTER: 0 fp, 1.0 tp, Good`, with false-positive culprits removed and
+distinguishing indicators retained. Re-running the same command
+multiple times in a row now produces byte-identical output, confirming
+the deterministic-selection fix. Also run against `Chapros.elf`,
+`RedXOR.elf`, and `Wirenet.elf` — each produced a valid, `Good`-rated
+rule with a distinct condition shape (string-only for the 32-bit
+`Wirenet.elf`, combined string-and-byte-pattern for the others).
 
 **Known limitations**
 
@@ -672,3 +710,10 @@ distinguishing indicator — retained.
   equivalent adjustment for `$bp*` (byte pattern) conditions, and does
   not attempt to combine string and byte-pattern conditions in new
   ways.
+- The clean corpus currently ships with only two files (`bat`,
+  `busybox_x86_64`). A rule clearing `check_false_positives()` today
+  is only proven clean against those two — a very generic byte
+  pattern (e.g. a bare `sub rsp, N` prologue) could still pass this
+  check while genuinely being common enough to false-positive against
+  a wider real-world clean corpus. Expanding the clean corpus would
+  directly improve the confidence `Good` verdicts deserve.
