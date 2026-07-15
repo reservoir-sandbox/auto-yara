@@ -139,7 +139,6 @@ def find_function_prologues(
         ):
             push_count += 1
 
-        # Кандидат на "sub rsp, N" — сразу после найденных push.
         sub_index = i + push_count
 
         if (
@@ -158,8 +157,6 @@ def find_function_prologues(
                 }
             )
 
-            # Сдвигаем i ЗА найденный пролог, чтобы не пытаться повторно
-            # матчить что-то внутри него.
             i = sub_index + 1
         else:
             i += 1
@@ -257,10 +254,6 @@ def find_suspicious_sequences(
             try:
                 syscall_number = int(value_str, 0)
             except ValueError:
-                # Второй операнд — не immediate-число (например,
-                # регистр: "mov rax, r9"). Мы не отслеживаем поток
-                # данных между регистрами, поэтому дальше искать для
-                # этого syscall бессмысленно — see docstring limitation.
                 break
 
             if syscall_number in _SUSPICIOUS_SYSCALLS:
@@ -278,8 +271,6 @@ def find_suspicious_sequences(
                     }
                 )
 
-            # Нашли mov в eax/rax (подозрительный или нет) — хватит
-            # искать назад для этого syscall.
             break
 
     return suspicious_sequences
@@ -321,8 +312,6 @@ def apply_wildcards(
     cs = Cs(CS_ARCH_X86, CS_MODE_64)
     cs.detail = True
 
-    # Re-disassemble just this match's bytes, starting at its own
-    # address, to get per-instruction operand detail.
     match_instructions = list(cs.disasm(match["bytes"], match["start_address"]))
 
     is_syscall_pattern = "pattern_name" in match
@@ -341,8 +330,6 @@ def apply_wildcards(
             hex_parts.append(insn_bytes.hex(" ").upper())
             continue
 
-        # imm_offset — с какого байта в insn_bytes начинается immediate;
-        # imm_size — сколько байт он реально занимает в кодировке.
         before = insn_bytes[: insn.imm_offset]
         wildcard_part = " ".join(["??"] * insn.imm_size)
         after = insn_bytes[insn.imm_offset + insn.imm_size :]
@@ -386,17 +373,12 @@ def extract_byte_patterns(elf_path: str) -> dict[str, Any]:
 
     patterns: list[dict[str, str]] = []
 
-    # Шаг 1: пронумеровать прологи как "p1", "p2", ... и получить
-    # для каждого hex_bytes через apply_wildcards(instructions, match).
     for index, match in enumerate(prologues, start=1):
         identifier = f"p{index}"
         hex_bytes = apply_wildcards(instructions, match)
         patterns.append({"identifier": identifier, "hex_bytes": hex_bytes})
         pass
 
-    # Шаг 2: то же самое для suspicious (можно использовать
-    # match["pattern_name"] как часть identifier для наглядности,
-    # например "syscall_execve_1", а не просто "s1").
     for index, match in enumerate(suspicious, start=1):
         identifier = f"{match['pattern_name']}_{index}"
         hex_bytes = apply_wildcards(instructions, match)
