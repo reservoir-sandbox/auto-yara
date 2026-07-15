@@ -39,12 +39,41 @@ def select_byte_patterns_for_rule(
     other_patterns = [
         p for p in patterns if not p["identifier"].startswith("direct_syscall_")
     ]
-    selected = (syscall_patterns + other_patterns)[:_MAX_BYTE_PATTERNS_IN_RULE]
+    selected_deduped = _deduplicate_by_hex_bytes(
+        syscall_patterns + other_patterns
+    )
+    selected = selected_deduped[:_MAX_BYTE_PATTERNS_IN_RULE]
 
     return [
         {"identifier": f"bp{index}", "hex_bytes": pattern["hex_bytes"]}
         for index, pattern in enumerate(selected, start=1)
     ]
+
+
+def _deduplicate_by_hex_bytes(
+    patterns: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    """Removes patterns with duplicate hex_bytes, keeping the first
+    occurrence (preserving priority order — e.g. syscall patterns
+    before prologues).
+
+    Args:
+        patterns: List of pattern dicts, each with "identifier" and
+            "hex_bytes". Order matters: earlier entries win ties.
+
+    Returns:
+        A new list with only the first occurrence of each distinct
+        hex_bytes value.
+    """
+    seen_hex_bytes: set[str] = set()
+    deduplicated = []
+
+    for pattern in patterns:
+        if pattern["hex_bytes"] not in seen_hex_bytes:
+            deduplicated.append(pattern)
+            seen_hex_bytes.add(pattern["hex_bytes"])
+
+    return deduplicated
 
 
 def build_string_condition(num_strings: int) -> str:
@@ -180,9 +209,11 @@ if __name__ == "__main__":
         help="Show all extracted byte patterns instead of a truncated preview",
     )
     parser.add_argument(
-        "--auto-improve",
-        action="store_true",
-        help="Run auto-improvement loop before saving the rule",
+        "--no-auto-improve",
+        action="store_false",
+        dest="auto_improve",
+        default=True,
+        help="Skip the auto-improvement loop (enabled by default)",
     )
     args = parser.parse_args()
 
