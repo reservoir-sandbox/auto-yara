@@ -6,6 +6,25 @@ import re
 
 _THRESHOLD_PATTERN = re.compile(r"(\d+) of \(\$s\*\)")
 _CLEAN_CORPUS_DIR = "corpus/clean"
+_STRING_CONDITION_FRAGMENT = re.compile(r"\s*and\s+\d+\s+of\s+\(\$s\*\)")
+_BP_CONDITION_FRAGMENT = re.compile(r"\s*and\s+\d+\s+of\s+\(\$bp\*\)")
+
+
+def _strip_empty_condition_fragments(builder: YaraRuleBuilder) -> None:
+    """Removes 'N of ($s*)'/'N of ($bp*)' from the condition if the
+    corresponding feature list is now empty (removing the fragment
+    entirely, not just lowering N, since a reference to zero strings
+    fails YARA compilation rather than harmlessly matching nothing).
+
+    Args:
+        builder: The YaraRuleBuilder to mutate in place.
+    """
+    if not builder.strings:
+        builder.set_condition(
+            _STRING_CONDITION_FRAGMENT.sub("", builder.condition)
+        )
+    if not builder.hex_patterns:
+        builder.set_condition(_BP_CONDITION_FRAGMENT.sub("", builder.condition))
 
 
 def check_false_positives(
@@ -151,42 +170,37 @@ def improve_rule(
         fp_matches = check_false_positives(rule_source, clean_paths)
 
         if not fp_matches:
-            break  # FP == 0, готово
+            break
 
         culprits = _extract_culprit_identifiers(fp_matches) - rejected_culprits
         if not culprits:
-            if _bump_string_threshold(
-                builder
-            ):  # некого удалять (защита от бесконечного цикла)
+            if _bump_string_threshold(builder):
                 continue
             else:
                 break
 
-        # попробовать удалить ОДНОГО виновника за раз
-        culprit = next(iter(culprits))  # взять любого одного
+        culprit = sorted(culprits)[0]
 
-        # 1. сохранить копии для отката
         strings_backup = builder.strings.copy()
         hex_patterns_backup = builder.hex_patterns.copy()
 
-        # 2. удалить
         builder.remove_feature(culprit)
 
-        # 3. проверить TP на новой версии
+        _strip_empty_condition_fragments(builder)
+
         new_tp = check_true_positives(builder.build(), malware_paths)
         if len(malware_paths) == 0:
             new_tp_rate = 0.0
         else:
             new_tp_rate = len(new_tp["matches"]) / len(malware_paths)
 
-        # 4. если tp_rate упал — откатить и... что делать дальше?
         if new_tp_rate < baseline_tp_rate:
             builder.strings = strings_backup
             builder.hex_patterns = hex_patterns_backup
             rejected_culprits.add(culprit)
 
         else:
-            baseline_tp_rate = new_tp_rate  # обновить baseline
+            baseline_tp_rate = new_tp_rate
 
     return builder
 
@@ -214,7 +228,7 @@ def _bump_string_threshold(builder: YaraRuleBuilder) -> bool:
     num_strings = len(builder.strings)
 
     if current_threshold >= num_strings:
-        return False  # Already at max threshold
+        return False
 
     new_threshold = current_threshold + 1
     new_condition = _THRESHOLD_PATTERN.sub(
@@ -226,32 +240,17 @@ def _bump_string_threshold(builder: YaraRuleBuilder) -> bool:
 
 if __name__ == "__main__":
 
-    # from feature_extractor import extract_strings
-
-    # strings = extract_strings("corpus/malware/Mirai_64.elf")
-    # for s in strings[:20]:
-    #     print(s["value"])
-
     rule_builder = YaraRuleBuilder("TestFallbackRule")
-    rule_builder.add_string(
-        "s1", "/dev/null"
-    )  # единственный реальный TP-источник, но и FP-виновник
-    rule_builder.add_string(
-        "s2", "totally_fake_xyz123"
-    )  # заведомо нигде не существует
-    rule_builder.add_string(
-        "s3", "another_fake_abc456"
-    )  # заведомо нигде не существует
+    rule_builder.add_string("s1", "/dev/null")
+    rule_builder.add_string("s2", "totally_fake_xyz123")
+    rule_builder.add_string("s3", "another_fake_abc456")
     rule_builder.set_condition("uint32(0) == 0x464C457F and 1 of ($s*)")
 
-    # задай condition в формате, который узнает _THRESHOLD_PATTERN:
-    # что-то вида "uint32(0) == 0x464C457F and 1 of ($s*)"
     rule_builder.set_condition("uint32(0) == 0x464C457F and 1 of ($s*)")
 
     malware_samples = ["corpus/malware/Mirai_64.elf"]
     clean_samples = ["corpus/clean/bat", "corpus/clean/busybox_x86_64"]
 
-    # сначала посмотри на отчёт ДО улучшения — полезно для сравнения
     before_report = get_quality_report(
         rule_builder.build(), malware_samples, clean_samples
     )
